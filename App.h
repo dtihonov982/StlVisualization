@@ -6,6 +6,7 @@
 #include <string>
 #include "Chart.h"
 #include "Journal.h"
+#include <stack>
 
 class App {
 public:
@@ -21,6 +22,7 @@ private:
     SDL_Renderer* renderer_;
     std::string title_;
     std::vector<int> data_;
+    std::stack<int> markedPos_;
     Journal journal_;
     typename Journal::iterator currentEntry_;
     Chart chart_;

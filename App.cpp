@@ -43,15 +43,31 @@ void App::update() {
     if (currentEntry_ >= journal_.end())
         return;
 
+    //back colors to default
+    while (!markedPos_.empty()) {
+        chart_.resetElementColor(markedPos_.top());
+        markedPos_.pop();
+    }
+
     auto entry = *currentEntry_;
     //TODO:double condition checking
     if (entry[0] == "r") {
         std::cout << "reading at " << entry[1] << " position\n";
         int pos = std::stoi(entry[1]);
         chart_.setElementColor(pos, {255, 255, 255, 255});
+        markedPos_.push(pos);
     }
     else if (entry[0] == "w") {
         std::cout << "writing a " << entry[2] << " in " << entry[1] << " position\n";
+        //TODO: doubling code
+        int pos = std::stoi(entry[1]);
+        int value = std::stoi(entry[2]);
+        data_[pos] = value;
+        //TODO:incremental
+        chart_.update(data_.begin(), data_.end());
+
+        chart_.setElementColor(pos, {255, 0, 0, 255});
+        markedPos_.push(pos);
     }
 
     ++currentEntry_;

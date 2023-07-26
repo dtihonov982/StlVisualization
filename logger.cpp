@@ -162,10 +162,9 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
 
 int main() {
     //std::vector<int> data {10, 20};
-    std::vector<int> data(10);
+    std::vector<int> data(100);
     std::iota(data.rbegin(), data.rend(), 0);
 
-    std::cout << data << "\n\n";
 
     AccessLogger logger{data, std::cout};
     auto begin_ = IterDecorator(data.begin(), logger);
@@ -185,7 +184,6 @@ int main() {
 
     logger.finalize();
 
-    std::cout << '\n' << data << '\n';
 
     return 0;
 }
