@@ -6,20 +6,8 @@
 #include <vector>
 #include <cassert>
 #include <sstream>
+#include <SDL2/SDL.h>
 
-struct SDL_Color {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
-};
-
-struct SDL_Rect {
-    int x;
-    int y;
-    int w;
-    int h;
-};
 
 //draw chart from vector values
 class Chart {
@@ -32,7 +20,7 @@ public:
         update(begin, end);
     }
 
-    void draw() {
+    void dump() {
         std::cout << "x: " << x_ << '\n';
         std::cout << "y: " << y_ << '\n';
         std::cout << "w: " << w_ << '\n';
@@ -49,6 +37,32 @@ public:
         if (!elements_.empty()){
             auto last = elements_.back();
             std::cout << "bound: " << last.x_ + last.w_ << '\n';
+        }
+    }
+
+    void draw(SDL_Renderer* renderer) {
+        SDL_SetRenderDrawColor(
+            renderer,
+            backgroundColor_.r, 
+            backgroundColor_.g,
+            backgroundColor_.b,
+            backgroundColor_.a
+        );
+        SDL_Rect chartArea {x_, y_, w_, h_};
+
+        SDL_RenderFillRect(renderer, &chartArea);
+
+        for (auto& element: elements_) {
+            SDL_SetRenderDrawColor(
+                renderer,
+                element.color_.r, 
+                element.color_.g,
+                element.color_.b,
+                element.color_.a
+            );
+
+            SDL_Rect current {element.x_, element.y_, element.w_, element.h_};
+            SDL_RenderFillRect(renderer, &current);
         }
     }
 
@@ -136,8 +150,8 @@ private:
     int y_;
     int w_;
     int h_;
-    SDL_Color backgroundColor_     = {  0,   0,   0, 255};
-    SDL_Color defaultElementColor_ = {255, 255, 255, 255};
+    SDL_Color backgroundColor_     = {  0x00,   0x3f,   0x5c, 255};
+    SDL_Color defaultElementColor_ = { 0xff, 0x63, 0x61, 255};
     float gapRate_ = 2.0f; //gapRate_ = gapWidth / elementWidth;
 };
 
@@ -151,13 +165,48 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
 }
 
 int main() {
-    std::vector<float> data(10);
-    std::iota(data.begin(), data.end(), 0.1f);
-    std::cout << data << '\n';
-
-    SDL_Rect rect {0, 0, 10, 200};
-    Chart chart(rect, data.cbegin(), data.cend());
+    #if 0
     chart.draw();
+    #endif
+    int windowWidth = 800;
+    int windowHeight = 640;
+    const char* title = "Title";
+
+    std::vector<int> data(100);
+    std::iota(data.begin(), data.end(), 1);
+
+    float chartAreaRatio = 0.80f;
+    int chartWidth = static_cast<int>(windowWidth * chartAreaRatio);
+    int chartHeight = static_cast<int>(windowHeight * chartAreaRatio);
+    int chartX = (windowWidth - chartWidth) / 2;
+    int chartY = (windowHeight - chartHeight) / 2;
+    SDL_Rect rect {chartX, chartY, chartWidth, chartHeight};
+
+    Chart chart(rect, data.cbegin(), data.cend());
+
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    
+    SDL_Init(SDL_INIT_EVERYTHING);
+    window = SDL_CreateWindow(title, 
+                    SDL_WINDOWPOS_CENTERED, 
+                    SDL_WINDOWPOS_CENTERED, 
+                    windowWidth, windowHeight, 0);
+    renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_SetRenderDrawColor(renderer, 0x00,   0x3f,   0x5c, 255);
+
+    
+	SDL_RenderClear(renderer);
+
+    chart.draw(renderer);
+
+	SDL_RenderPresent(renderer);
+
+    SDL_Delay(10000);
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
+	SDL_Quit();
+
 
     return 0;
 }
