@@ -40,7 +40,7 @@ App::App(std::string_view logfile) {
 }
 
 void App::update() {
-    if (currentEntry_ >= journal_.end())
+    if (status_ == Pause || status_ == Done)
         return;
 
     //back colors to default
@@ -64,7 +64,6 @@ void App::update() {
         int pos = std::stoi(entry[1]);
         int value = std::stoi(entry[2]);
         data_[pos] = value;
-        //TODO:incremental
         chart_.update(data_.begin(), data_.end());
 
         chart_.setElementColor(pos, {255, 0, 0, 255});
@@ -72,30 +71,53 @@ void App::update() {
     }
 
     ++currentEntry_;
+
+    if (currentEntry_ >= journal_.end())
+        status_ = Done;
 }
 
 void App::handleEvents() {
     SDL_Event event;
-    //TODO: start with space key
     while (SDL_PollEvent(&event)) {
-        //event.type == SDL_KEYDOWN && event.key.keysum.sym == SDLK_ESCAPE
-        if (event.type == SDL_QUIT)
-            isRunning_ = false;
+        switch (event.type) {
+            case SDL_QUIT: isRunning_ = false; break;
+            case SDL_KEYDOWN: handleKeyDown(event); break;
+        }
+    }
+}
+
+void App::handleKeyDown(SDL_Event& event) {
+    switch (event.key.keysym.sym) {
+    case SDLK_ESCAPE: 
+        isRunning_ = false; 
+        break;
+    case SDLK_SPACE: 
+        if (status_ == Done) {
+            break;
+        }
+        else if (status_ == Play) {
+            status_ = Pause;
+            break;
+        }
+        else if (status_ == Pause) {
+            status_ = Play;
+            break;
+        }
     }
 }
 
 void App::render() {
-        SDL_SetRenderDrawColor(renderer_, 0x00,   0x3f,   0x5c, 255);
-	SDL_RenderClear(renderer_);
+    SDL_SetRenderDrawColor(renderer_, 0x00,   0x3f,   0x5c, 255);
+    SDL_RenderClear(renderer_);
 
-        chart_.draw(renderer_);
+    chart_.draw(renderer_);
 
-	SDL_RenderPresent(renderer_);
+    SDL_RenderPresent(renderer_);
 }
 
 App::~App() {
-        //TODO: check if objects have created
-	SDL_DestroyWindow(window_);
-	SDL_DestroyRenderer(renderer_);
-	SDL_Quit();
+    //TODO: check if objects have created
+    SDL_DestroyWindow(window_);
+    SDL_DestroyRenderer(renderer_);
+    SDL_Quit();
 }

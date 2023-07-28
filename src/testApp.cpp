@@ -16,10 +16,6 @@ int main(int argc, char** argv) {
     const int frameDelay = 1000 / fps;
     Uint32 frameStart;
     Uint32 frameTime;
-
-    int x;
-    std::cin >> x;
-
     while (app.isRunning()) {
         frameStart = SDL_GetTicks();
         

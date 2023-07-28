@@ -10,13 +10,17 @@
 
 class App {
 public:
+    enum Status { Play, Pause, Done };
     //TODO: Config file
     App(std::string_view logfile);
     ~App();
     void update();
     void render();
     void handleEvents();
+    void handleKeyDown(SDL_Event& event);
     bool isRunning() { return isRunning_; }
+    Status getStatus() { return status_;  }
+    void setStatus(Status status) { status_ = status; }
 private:
     SDL_Window* window_;
     SDL_Renderer* renderer_;
@@ -26,7 +30,8 @@ private:
     Journal journal_;
     typename Journal::iterator currentEntry_;
     Chart chart_;
-    //TODO: more states?
     bool isRunning_ = false;
+    //Runs paused. Starts with Space.
+    Status status_ = Pause;
 };
 #endif // APP_H
