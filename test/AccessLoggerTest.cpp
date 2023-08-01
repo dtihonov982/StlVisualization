@@ -22,7 +22,8 @@ int main() {
     auto begin_ = NotifyingIterator(data.begin(), logger);
     auto end_ = NotifyingIterator(data.end(), logger);
 
-    std::find(begin_, end_, 1000);
+    //std::find(begin_, end_, 1000);
+    std::sort(begin_, end_);
 
     logger.finalize();
 
