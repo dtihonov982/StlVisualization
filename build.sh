@@ -1,7 +1,14 @@
 #!/bin/bash
-if [ -z $1 ]
+
+OPTIONS="-g -Wall"
+VISUAL_SRC="src/testApp.cpp src/App.cpp src/Journal.cpp"
+LOGGER_SRC="src/logger.cpp src/Common.cpp"
+
+if [ $# = 0 ]
 then
-    g++ -g -o bin/visual src/testApp.cpp src/App.cpp src/Journal.cpp -lSDL2
+    set -x
+    g++ $OPTIONS -o bin/visual $VISUAL_SRC -lSDL2
+    g++ $OPTIONS -o bin/logger $LOGGER_SRC
 fi
 
 case $1 in
