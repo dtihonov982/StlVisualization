@@ -9,7 +9,6 @@
 template <typename OriginalIterator>
 class NotifyingIterator {
 public:
-    //TODO: get from original
     using iterator_category = typename OriginalIterator::iterator_category;
     using value_type = typename OriginalIterator::value_type;
     using difference_type = typename OriginalIterator::difference_type;
@@ -25,6 +24,7 @@ public:
 
     const reference operator [] (ptrdiff_t offset) const {
         sendMessage("const reference operator [] (ptrdiff_t offset) const");
+        sendAccessEvent();
         auto it = *this;
         it += offset;
         return *it;
@@ -32,6 +32,7 @@ public:
 
     reference operator [] (ptrdiff_t offset) {
         sendMessage("reference operator [] (ptrdiff_t offset)");
+        sendAccessEvent();
         auto it = *this;
         it += offset;
         return *it;
@@ -39,11 +40,13 @@ public:
 
     const reference operator * () const {
         sendMessage("const reference operator * () const");
+        sendAccessEvent();
         return *current_;
     }
 
     reference operator * () {
         sendMessage("reference operator * ()");
+        sendAccessEvent();
         return *current_;
     }
 
@@ -117,8 +120,14 @@ public:
         Message msg {text};
         handler_.handle(msg);       
     }
+    
+    void sendAccessEvent() const {
+        size_t pos = getOffset();
+        Access event(pos);
+        handler_.handle(event);
+    }
 
-    difference_type getOffset() {
+    difference_type getOffset() const {
         return std::distance(original_, current_);
     }
 

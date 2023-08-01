@@ -5,7 +5,7 @@
 
 class Event {
 public:
-    enum Type { Message };  
+    enum Type { Message, Access };  
     Type getType() { return type_; }  
     virtual ~Event() {}
 protected:
@@ -28,6 +28,16 @@ public:
     std::string getText() { return text_; }
 private:
     std::string text_;
+};
+
+class Access: public Event {
+public:
+    Access(size_t pos)
+    : Event(Event::Access)
+    , pos_(pos) {}
+    size_t getPos() const { return pos_; }
+private:
+    size_t pos_;
 };
 
 #endif //EVENT_H
