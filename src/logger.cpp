@@ -146,6 +146,23 @@ void unique() {
     logger.finalize();
 }
 
+void reverse() {
+    std::vector<int> data(50);
+    std::iota(data.begin(), data.end(), 1);
+
+    std::ofstream file{getPath("reverse")};
+    file << "reverse\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto end_ = NotifyingIterator(data.end(), data.begin(), logger);
+
+    std::reverse(begin_, end_);
+
+    logger.finalize();
+}
+
 int main() {
     sort();
     nth_element();
@@ -154,6 +171,7 @@ int main() {
     rotate();
     transform();
     unique();
+    reverse();
 
     //std::random_device rd;
     //std::mt19937 g(rd());
