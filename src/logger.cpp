@@ -34,6 +34,23 @@ void sort() {
     logger.finalize();
 }
 
+void partial_sort() {
+    std::vector<int> data = getRandVector(30, 0, 100);
+
+    std::ofstream file{getPath("partial_sort")};
+    file << "partial_sort\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, data.begin(), logger);
+    auto end_ = NotifyingIterator(data.end(), logger);
+
+    std::partial_sort(begin_, mid_, end_);
+
+    logger.finalize();
+}
+
 void partial_sum() {
     std::vector<int> data = getRandVector(50, 0, 100);
     std::ofstream file{getPath("partial_sum")};
@@ -96,6 +113,7 @@ void transform() {
 }
 int main() {
     sort();
+    partial_sort();
     partial_sum();
     rotate();
     transform();

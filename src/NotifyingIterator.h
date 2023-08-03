@@ -17,7 +17,12 @@ public:
 
     NotifyingIterator(OriginalIterator origin, IEventHandler& handler)
     : handler_(handler) 
-    , original_(origin)
+    , begin_(origin)
+    , current_(origin) {}
+
+    NotifyingIterator(OriginalIterator origin, OriginalIterator begin, IEventHandler& handler)
+    : handler_(handler) 
+    , begin_(begin)
     , current_(origin) {}
 
 //access operations -----------------------------------
@@ -57,7 +62,7 @@ public:
         if (*this == other)
             return *this;
         current_ = other.current_;
-        original_ = other.original_;
+        begin_ = other.begin_;
         return *this;
     }
 
@@ -128,12 +133,12 @@ public:
     }
 
     difference_type getOffset() const {
-        return std::distance(original_, current_);
+        return std::distance(begin_, current_);
     }
 
 private:    
     IEventHandler& handler_;
-    OriginalIterator original_;
+    OriginalIterator begin_;
     OriginalIterator current_;
 };
 

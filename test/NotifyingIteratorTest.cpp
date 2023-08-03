@@ -29,10 +29,18 @@ void partitionCase(IEventHandler& handler) {
     std::partition(begin_, end_, [] (int x) { return x % 3; });
 }
 
+void partial_sort(IEventHandler& handler) {
+    auto data = getMonotonic(30, 1, false);
+    auto begin_ = NotifyingIterator(data.begin(), handler);
+    auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, handler);
+    auto end_ = NotifyingIterator(data.end(), handler);
+    std::partial_sort(begin_, mid_, end_);
+}
+
 int main() {
     DebugLogger log;
     //sortCase(log);
-    partitionCase(log);
+    partial_sort(log);
     #if 0
     std::vector<float> data(10);
     std::iota(data.rbegin(), data.rend(), 0.1f);
