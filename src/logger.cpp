@@ -48,9 +48,29 @@ void partial_sum() {
     logger.finalize();
 }
 
+
+void rotate() {
+    std::vector<int> data(100);
+    std::iota(data.begin(), data.end(), 0);
+
+    std::ofstream file{getPath("rotate")};
+    file << "rotate\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto mid_ = NotifyingIterator(data.begin() + 50, logger);
+    auto end_ = NotifyingIterator(data.end(), logger);
+
+    std::rotate(begin_, mid_, end_);
+
+    logger.finalize();
+}
+
 int main() {
     sort();
     partial_sum();
+    rotate();
     //std::random_device rd;
     //std::mt19937 g(rd());
     //std::vector<int> data {10, 20};
