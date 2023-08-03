@@ -52,13 +52,13 @@ void App::update() {
     auto entry = *currentEntry_;
     //TODO:double condition checking
     //TODO: many changes at one time for fast displaying of long arrays
-    if (entry[0] == "r") {
+    if (entry[0] == "access") {
         //std::cout << "reading at " << entry[1] << " position\n";
         int pos = std::stoi(entry[1]);
         chart_.setElementColor(pos, {255, 255, 255, 255});
         markedPos_.push(pos);
     }
-    else if (entry[0] == "w") {
+    else if (entry[0] == "write") {
         //std::cout << "writing a " << entry[2] << " in " << entry[1] << " position\n";
         //TODO: doubling code
         int pos = std::stoi(entry[1]);
@@ -66,7 +66,7 @@ void App::update() {
         data_[pos] = value;
         chart_.update(data_.begin(), data_.end());
 
-        chart_.setElementColor(pos, {255, 0, 0, 255});
+        chart_.setElementColor(pos, {255, 255, 255, 255});
         markedPos_.push(pos);
     }
 
