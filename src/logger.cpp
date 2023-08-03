@@ -67,10 +67,38 @@ void rotate() {
     logger.finalize();
 }
 
+void transform_rand() {
+    std::vector<int> data = getRandVector(50, 0, 100);
+    std::ofstream file{getPath("transform rand")};
+    file << "transform rand *2\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto end_ = NotifyingIterator(data.end(), logger);
+
+    std::transform(begin_, end_, begin_, [] (int x) { return 2 *x; });
+
+    logger.finalize();
+}
+
+void transform() {
+    std::vector<int> data(10, 1);
+    std::ofstream file{getPath("transform")};
+    file << "transform *2\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto end_ = NotifyingIterator(data.end(), logger);
+
+    std::transform(begin_, end_, begin_, [] (int x) { return 2 *x; });
+
+    logger.finalize();
+}
 int main() {
     sort();
     partial_sum();
     rotate();
+    transform();
     //std::random_device rd;
     //std::mt19937 g(rd());
     //std::vector<int> data {10, 20};
