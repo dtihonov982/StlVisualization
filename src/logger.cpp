@@ -45,7 +45,7 @@ void nth_element() {
 
     auto begin_ = NotifyingIterator(data.begin(), logger);
     auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto end_ = NotifyingIterator(data.end(), data.begin(), logger);
 
     std::nth_element(begin_, mid_, end_);
 
@@ -148,11 +148,13 @@ void unique() {
 
 int main() {
     sort();
+    nth_element();
     partial_sort();
     partial_sum();
     rotate();
     transform();
     unique();
+
     //std::random_device rd;
     //std::mt19937 g(rd());
     //std::vector<int> data {10, 20};
