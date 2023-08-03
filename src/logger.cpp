@@ -10,12 +10,19 @@
 #include "NotifyingIterator.h"
 #include "Common.h"
 
+std::string getPath(std::string_view algoName) {
+    std::string path{"logs/"};
+    path += algoName;
+    path += ".txt";
+    return path;
+}
+
 void sort() {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
 
-    std::ofstream file{"logs/sort.txt"};
-    file << "title\n" << data << '\n';
+    std::ofstream file{getPath("sort")};
+    file << "small sort\n" << data << '\n';
 
     AccessLogger logger{data, file};
 
@@ -29,8 +36,8 @@ void sort() {
 
 void partial_sum() {
     std::vector<int> data = getRandVector(50, 0, 100);
-    std::ofstream file{"logs/partial_sum.txt"};
-    file << "title\n" << data << '\n';
+    std::ofstream file{getPath("partial_sum")};
+    file << "partial_sum\n" << data << '\n';
 
     AccessLogger logger{data, file};
     auto begin_ = NotifyingIterator(data.begin(), logger);
