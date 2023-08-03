@@ -30,7 +30,7 @@ public:
     void checkWriting() {
         for (size_t i = 0; i < copy_.size(); ++i) {
             if (copy_[i] != original_[i]) {
-                log_ << "change," << i << "," << original_[i] << '\n';
+                log_ << "write," << i << "," << original_[i] << '\n';
                 copy_[i] = original_[i];
             }
         }
