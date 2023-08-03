@@ -34,6 +34,24 @@ void sort() {
     logger.finalize();
 }
 
+void nth_element() {
+    std::vector<int> data(10);
+    std::iota(data.rbegin(), data.rend(), 0);
+
+    std::ofstream file{getPath("nth_element")};
+    file << "nth_element\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, data.begin(), logger);
+    auto end_ = NotifyingIterator(data.end(), logger);
+
+    std::nth_element(begin_, mid_, end_);
+
+    logger.finalize();
+}
+
 void partial_sort() {
     std::vector<int> data = getRandVector(30, 0, 100);
 
@@ -111,12 +129,30 @@ void transform() {
 
     logger.finalize();
 }
+
+//not representative
+void unique() {
+    
+    std::vector<int> data = getRandVector(50, 0, 4);
+    std::ofstream file{getPath("unique")};
+    file << "unique\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+    auto begin_ = NotifyingIterator(data.begin(), logger);
+    auto end_ = NotifyingIterator(data.end(), logger);
+
+    std::unique(begin_, end_);
+
+    logger.finalize();
+}
+
 int main() {
     sort();
     partial_sort();
     partial_sum();
     rotate();
     transform();
+    unique();
     //std::random_device rd;
     //std::mt19937 g(rd());
     //std::vector<int> data {10, 20};

@@ -97,6 +97,10 @@ public:
         return current_ < rhs.current_;
     }
 
+    bool operator <= (const NotifyingIterator& rhs) const {
+        sendMessage("bool operator <= (const NotifyingIterator& rhs) const");
+        return current_ <= rhs.current_;
+    }
     difference_type operator - (NotifyingIterator const & other) const {
         sendMessage("difference_type operator - (NotifyingIterator const & other) const");
         return current_ - other.current_;
