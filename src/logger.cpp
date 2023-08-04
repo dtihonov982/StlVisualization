@@ -10,6 +10,11 @@
 #include "NotifyingIterator.h"
 #include "Common.h"
 
+class NullLogger: public IEventHandler {
+public:
+    void handle(Event& e) override {}
+};
+
 std::string getPath(std::string_view algoName) {
     std::string path{"logs/"};
     path += algoName;
@@ -163,6 +168,29 @@ void reverse() {
     logger.finalize();
 }
 
+void search() {
+    std::vector<int> data(50);
+    std::iota(data.begin(), data.end(), 1);
+
+    std::vector<int> needle(data.begin() + 10, data.begin() + 20);
+
+    std::ofstream file{getPath("search")};
+    file << "search\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto begin = NotifyingIterator(data.begin(), logger);
+    auto end = NotifyingIterator(data.end(), data.begin(), logger);
+
+    NullLogger nullLogger{};
+    auto begin2 = NotifyingIterator(needle.begin(), nullLogger);
+    auto end2 = NotifyingIterator(needle.end(), needle.begin(), nullLogger);
+
+    std::search(begin, end, begin2, end2);
+
+    logger.finalize();
+}
+
 int main() {
     sort();
     nth_element();
@@ -172,6 +200,7 @@ int main() {
     transform();
     unique();
     reverse();
+    search();
 
     //std::random_device rd;
     //std::mt19937 g(rd());
