@@ -1,4 +1,4 @@
-#ifndef ACCESSLOGGER_H 
+#ifndef ACCESSLOGGER_H
 #define ACCESSLOGGER_H
 
 #include <vector>
@@ -6,6 +6,10 @@
 
 #include "Event.h"
 
+//AccessLogger logs changes in Container by using information aboud access to it.
+//After each access AccessLogger compares it's own version of Container and
+//original version of Container, that may have been changed. If there is difference
+//then was changes.
 template<typename Container>
 class AccessLogger: public IEventHandler {
 public:

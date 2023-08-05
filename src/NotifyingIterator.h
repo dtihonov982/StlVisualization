@@ -3,9 +3,11 @@
 
 #include <iterator>
 #include <string>
+#include <cassert>
 
 #include "Event.h"
 
+//Iterator what sends differend information about what is going on to IEventHandler
 template <typename OriginalIterator>
 class NotifyingIterator {
 public:
@@ -131,7 +133,8 @@ public:
     }
     
     void sendAccessEvent() const {
-        size_t pos = getOffset();
+        difference_type pos = getOffset();
+        assert(pos >= 0);
         Access event(pos);
         handler_.handle(event);
     }
