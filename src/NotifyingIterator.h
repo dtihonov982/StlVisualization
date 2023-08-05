@@ -17,15 +17,10 @@ public:
     using pointer = typename OriginalIterator::pointer;
     using reference = typename OriginalIterator::reference;
 
-    NotifyingIterator(OriginalIterator origin, IEventHandler& handler)
-    : handler_(handler) 
-    , begin_(origin)
-    , current_(origin) {}
-
-    NotifyingIterator(OriginalIterator origin, OriginalIterator begin, IEventHandler& handler)
+    NotifyingIterator(OriginalIterator begin, OriginalIterator original, IEventHandler& handler)
     : handler_(handler) 
     , begin_(begin)
-    , current_(origin) {}
+    , current_(original) {}
 
 //access operations -----------------------------------
 
