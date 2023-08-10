@@ -191,6 +191,25 @@ void search() {
     logger.finalize();
 }
 
+void inplace_merge() {
+    std::vector<int> data = getRandVector(50, 1, 300);
+    std::sort(data.begin(), data.begin() + data.size() / 2);
+    std::sort(data.begin() + data.size() / 2, data.end());
+
+    std::ofstream file{getPath("inplace_merge")};
+    file << "inplace_merge\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto begin = NotifyingIterator(data.begin(), logger);
+    auto mid = NotifyingIterator(data.begin() + data.size() / 2, logger);
+    auto end = NotifyingIterator(data.end(), logger);
+
+    std::inplace_merge(begin, mid, end);
+
+    logger.finalize();
+}
+
 int main() {
     sort();
     nth_element();
@@ -201,6 +220,7 @@ int main() {
     unique();
     reverse();
     search();
+    inplace_merge();
 
     //std::random_device rd;
     //std::mt19937 g(rd());
