@@ -9,7 +9,7 @@ OPTIONS="-g -Wall"
 VISUAL_SRC="src/testApp.cpp src/App.cpp src/Journal.cpp"
 LOGGER_SRC="src/logger.cpp src/Common.cpp"
 
-g++ $OPTIONS -o bin/logger $LOGGER_SRC
+g++ $OPTIONS -o bin/logger $LOGGER_SRC -lgtest
 cd bin
 ./logger
 ./visual logs/$1.txt

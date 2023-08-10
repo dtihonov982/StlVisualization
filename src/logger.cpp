@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -22,7 +24,7 @@ std::string getPath(std::string_view algoName) {
     return path;
 }
 
-void sort() {
+TEST(std_algorithm, sort) {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
 
@@ -39,7 +41,7 @@ void sort() {
     logger.finalize();
 }
 
-void nth_element() {
+TEST(std_algorithm, nth_element) {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
 
@@ -57,7 +59,7 @@ void nth_element() {
     logger.finalize();
 }
 
-void partial_sort() {
+TEST(std_algorithm, partial_sort) {
     std::vector<int> data = getRandVector(30, 0, 100);
 
     std::ofstream file{getPath("partial_sort")};
@@ -74,7 +76,7 @@ void partial_sort() {
     logger.finalize();
 }
 
-void partial_sum() {
+TEST(std_algorithm, partial_sum) {
     std::vector<int> data = getRandVector(50, 0, 100);
     std::ofstream file{getPath("partial_sum")};
     file << "partial_sum\n" << data << '\n';
@@ -89,7 +91,7 @@ void partial_sum() {
 }
 
 
-void rotate() {
+TEST(std_algorithm, rotate) {
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
@@ -107,7 +109,7 @@ void rotate() {
     logger.finalize();
 }
 
-void transform_rand() {
+TEST(std_algorithm, transform_rand) {
     std::vector<int> data = getRandVector(50, 0, 100);
     std::ofstream file{getPath("transform rand")};
     file << "transform rand *2\n" << data << '\n';
@@ -121,7 +123,7 @@ void transform_rand() {
     logger.finalize();
 }
 
-void transform() {
+TEST(std_algorithm, transform) {
     std::vector<int> data(10, 1);
     std::ofstream file{getPath("transform")};
     file << "transform *2\n" << data << '\n';
@@ -136,7 +138,7 @@ void transform() {
 }
 
 //not representative
-void unique() {
+TEST(std_algorithm, unique) {
     
     std::vector<int> data = getRandVector(50, 0, 4);
     std::ofstream file{getPath("unique")};
@@ -151,7 +153,7 @@ void unique() {
     logger.finalize();
 }
 
-void reverse() {
+TEST(std_algorithm, reverse) {
     std::vector<int> data(50);
     std::iota(data.begin(), data.end(), 1);
 
@@ -168,7 +170,7 @@ void reverse() {
     logger.finalize();
 }
 
-void search() {
+TEST(std_algorithm, search) {
     std::vector<int> data(50);
     std::iota(data.begin(), data.end(), 1);
 
@@ -191,7 +193,7 @@ void search() {
     logger.finalize();
 }
 
-void inplace_merge() {
+TEST(std_algorithm, inplace_merge) {
     std::vector<int> data = getRandVector(50, 1, 300);
     std::sort(data.begin(), data.begin() + data.size() / 2);
     std::sort(data.begin() + data.size() / 2, data.end());
@@ -210,7 +212,11 @@ void inplace_merge() {
     logger.finalize();
 }
 
-int main() {
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+
+#if 0
     sort();
     nth_element();
     partial_sort();
@@ -221,6 +227,7 @@ int main() {
     reverse();
     search();
     inplace_merge();
+#endif
 
     //std::random_device rd;
     //std::mt19937 g(rd());
