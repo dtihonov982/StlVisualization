@@ -17,30 +17,15 @@ std::vector<int> getMonotonic(int count, int first = 1, bool ascending = true) {
 
 void sortCase(IEventHandler& handler) {
     auto data = getMonotonic(10, 1, false);
-    auto begin_ = NotifyingIterator(data.begin(), handler);
-    auto end_ = NotifyingIterator(data.end(), handler);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), handler);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), handler);
     std::sort(begin_, end_);
 }
 
-void partitionCase(IEventHandler& handler) {
-    auto data = getMonotonic(10);
-    auto begin_ = NotifyingIterator(data.begin(), handler);
-    auto end_ = NotifyingIterator(data.end(), handler);
-    std::partition(begin_, end_, [] (int x) { return x % 3; });
-}
-
-void partial_sort(IEventHandler& handler) {
-    auto data = getMonotonic(30, 1, false);
-    auto begin_ = NotifyingIterator(data.begin(), handler);
-    auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, handler);
-    auto end_ = NotifyingIterator(data.end(), handler);
-    std::partial_sort(begin_, mid_, end_);
-}
 
 int main() {
     DebugLogger log;
-    //sortCase(log);
-    partial_sort(log);
+    sortCase(log);
     #if 0
     std::vector<float> data(10);
     std::iota(data.rbegin(), data.rend(), 0.1f);
