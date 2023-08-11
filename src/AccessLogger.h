@@ -21,6 +21,9 @@ public:
     {}
 
     void handle(Event& event) override {
+        if (!isActive) 
+            return;
+
         if (event.getType() != Event::Access)
             return;
 
@@ -42,9 +45,11 @@ public:
 
     void finalize() {
         checkWriting();
+        isActive = false;
     }
 
 private:
+    bool isActive = true;
     std::ostream& log_;
 
     Container copy_;
