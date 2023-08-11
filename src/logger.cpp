@@ -17,6 +17,27 @@ public:
     void handle(Event& e) override {}
 };
 
+using OriginalIterator = std::vector<int>::iterator;
+using NIter = NotifyingIterator<OriginalIterator>;
+
+//return two NotifyingIterators to begin and end of the data
+std::pair<NIter, NIter>
+getNI(std::vector<int>& data, IEventHandler& handler) {
+    auto begin = NotifyingIterator(data.begin(), data.begin(), handler);
+    auto end = NotifyingIterator(data.begin(), data.end(), handler);
+    return {begin, end};
+}
+
+//return three NotifyingIterators
+//1. begin, 2. begin + middlePos, 3. end
+std::tuple<NIter, NIter, NIter>
+getNI(std::vector<int>& data, IEventHandler& handler, size_t middlePos) {
+    assert(middlePos < data.size());
+    auto middle = NotifyingIterator(data.begin(), data.begin() + middlePos, handler);
+    auto [begin, end] = getNI(data, handler);
+    return {begin, middle, end};
+}
+
 std::string getPath(std::string_view algoName) {
     std::string path{"logs/"};
     path += algoName;
@@ -25,10 +46,24 @@ std::string getPath(std::string_view algoName) {
 }
 
 TEST(std_algorithm, sort) {
+    std::vector<int> data = getRandVector(50, 1, 1000);
+
+    std::ofstream file{getPath("sort")};
+    file << "sort\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+    std::sort(begin, end);
+
+    logger.finalize();
+}
+
+TEST(std_algorithm, small_sort) {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
 
-    std::ofstream file{getPath("sort")};
+    std::ofstream file{getPath("small_sort")};
     file << "small sort\n" << data << '\n';
 
     AccessLogger logger{data, file};
@@ -203,9 +238,7 @@ TEST(std_algorithm, inplace_merge) {
 
     AccessLogger logger{data, file};
 
-    auto begin = NotifyingIterator(data.begin(), data.begin(), logger);
-    auto mid = NotifyingIterator(data.begin(), data.begin() + data.size() / 2, logger);
-    auto end = NotifyingIterator(data.begin(), data.end(), logger);
+    auto [begin, mid, end] = getNI(data, logger, data.size() / 2);
 
     std::inplace_merge(begin, mid, end);
 
