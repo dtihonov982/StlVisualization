@@ -280,6 +280,22 @@ TEST(std_algorithm, up_low_bound) {
     logger.finalize();
     }
     
+    //equal_range
+    {
+    std::ofstream file{getPath("equal_range")};
+    file << "equal range\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+
+    auto [first, last] = std::equal_range(begin, end, 150);
+    *first; *last;
+    logger.finalize();
+
+    EXPECT_TRUE(std::all_of(first, last, [] (int x) { return x == 150; }));
+
+    }
 }
 
 int main(int argc, char** argv) {
