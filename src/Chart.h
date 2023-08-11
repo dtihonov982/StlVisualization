@@ -9,19 +9,20 @@
 
 #include "Common.h"
 
+//build a set of rectangles in area what represents [first; last) as a chart diagram
 template<typename It>
-std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int max) {
-    using value_type = typename It::value_type;
+std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int maxSize, int maxValue) {
     size_t size = last - first;
+    assert(size <= maxSize);
     std::vector<SDL_Rect> result;
     if (size == 0)
         return result;
     if (size == 1)
         return result;
-    if (size > area.w)
+    if (maxSize > area.w)
         return result; //to many data to visualize in area
 
-    float rectWidth = area.w / (size + (size - 1) * gapRate);     
+    float rectWidth = area.w / (maxSize + (maxSize - 1) * gapRate);     
     float gapWidth;
     if (rectWidth >= 1.0f) {
         gapWidth  = gapRate * rectWidth;
@@ -29,14 +30,15 @@ std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, i
     //If too many data for gape rate, change gape rate
     else {
         rectWidth = 1.0f;
-        gapWidth = static_cast<float>(area.w - size) / (size - 1);
+        gapWidth = static_cast<float>(area.w - maxSize) / (maxSize - 1);
     }
 
     float baseX = area.x;
     float baseY = area.y + area.h;
 
     while (first < last) {
-        float currH = *first * area.h / max;
+        assert(*first <= maxValue);
+        float currH = *first * area.h / maxValue;
         SDL_Rect currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
         result.push_back(currRect);
         baseX += gapWidth + rectWidth;
@@ -124,7 +126,7 @@ public:
 
         SDL_Rect area{x_, y_, w_, h_};
         int max = *std::max_element(begin, end);
-        auto rectangles = emplace(area, begin, end, gapRate_, max);
+        auto rectangles = emplace(area, begin, end, gapRate_, end - begin, max);
 
         for (auto& rect: rectangles) {
             elements_.emplace_back(rect.x, rect.y, rect.w, rect.h, defaultElementColor_);
