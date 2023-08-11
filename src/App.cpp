@@ -30,7 +30,7 @@ App::App(std::string_view logfile) {
 
     
     SDL_Init(SDL_INIT_EVERYTHING);
-    window_ = SDL_CreateWindow(windowTitle.c_str(), 
+    window_ = SDL_CreateWindow(title_.data(), 
                     SDL_WINDOWPOS_CENTERED, 
                     SDL_WINDOWPOS_CENTERED, 
                     windowWidth, windowHeight, 0);
