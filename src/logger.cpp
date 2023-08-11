@@ -33,8 +33,8 @@ TEST(std_algorithm, sort) {
 
     AccessLogger logger{data, file};
 
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::sort(begin_, end_);
 
@@ -50,9 +50,9 @@ TEST(std_algorithm, nth_element) {
 
     AccessLogger logger{data, file};
 
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), data.begin(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto mid_ = NotifyingIterator(data.begin(), data.begin() + data.size() / 2, logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::nth_element(begin_, mid_, end_);
 
@@ -67,9 +67,9 @@ TEST(std_algorithm, partial_sort) {
 
     AccessLogger logger{data, file};
 
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto mid_ = NotifyingIterator(data.begin() + data.size() / 2, data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto mid_ = NotifyingIterator(data.begin(), data.begin() + data.size() / 2, logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::partial_sort(begin_, mid_, end_);
 
@@ -82,8 +82,8 @@ TEST(std_algorithm, partial_sum) {
     file << "partial_sum\n" << data << '\n';
 
     AccessLogger logger{data, file};
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::partial_sum(begin_, end_, begin_);
 
@@ -100,9 +100,9 @@ TEST(std_algorithm, rotate) {
 
     AccessLogger logger{data, file};
 
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto mid_ = NotifyingIterator(data.begin() + 50, logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto mid_ = NotifyingIterator(data.begin(), data.begin() + 50, logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::rotate(begin_, mid_, end_);
 
@@ -115,8 +115,8 @@ TEST(std_algorithm, transform_rand) {
     file << "transform rand *2\n" << data << '\n';
 
     AccessLogger logger{data, file};
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::transform(begin_, end_, begin_, [] (int x) { return 2 *x; });
 
@@ -129,8 +129,8 @@ TEST(std_algorithm, transform) {
     file << "transform *2\n" << data << '\n';
 
     AccessLogger logger{data, file};
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::transform(begin_, end_, begin_, [] (int x) { return 2 *x; });
 
@@ -145,8 +145,8 @@ TEST(std_algorithm, unique) {
     file << "unique\n" << data << '\n';
 
     AccessLogger logger{data, file};
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::unique(begin_, end_);
 
@@ -162,8 +162,8 @@ TEST(std_algorithm, reverse) {
 
     AccessLogger logger{data, file};
 
-    auto begin_ = NotifyingIterator(data.begin(), logger);
-    auto end_ = NotifyingIterator(data.end(), data.begin(), logger);
+    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::reverse(begin_, end_);
 
@@ -181,12 +181,12 @@ TEST(std_algorithm, search) {
 
     AccessLogger logger{data, file};
 
-    auto begin = NotifyingIterator(data.begin(), logger);
-    auto end = NotifyingIterator(data.end(), data.begin(), logger);
+    auto begin = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto end = NotifyingIterator(data.begin(), data.end(), logger);
 
     NullLogger nullLogger{};
-    auto begin2 = NotifyingIterator(needle.begin(), nullLogger);
-    auto end2 = NotifyingIterator(needle.end(), needle.begin(), nullLogger);
+    auto begin2 = NotifyingIterator(needle.begin(), needle.begin(), nullLogger);
+    auto end2 = NotifyingIterator(needle.begin(), needle.end(), nullLogger);
 
     std::search(begin, end, begin2, end2);
 
@@ -203,9 +203,9 @@ TEST(std_algorithm, inplace_merge) {
 
     AccessLogger logger{data, file};
 
-    auto begin = NotifyingIterator(data.begin(), logger);
-    auto mid = NotifyingIterator(data.begin() + data.size() / 2, logger);
-    auto end = NotifyingIterator(data.end(), logger);
+    auto begin = NotifyingIterator(data.begin(), data.begin(), logger);
+    auto mid = NotifyingIterator(data.begin(), data.begin() + data.size() / 2, logger);
+    auto end = NotifyingIterator(data.begin(), data.end(), logger);
 
     std::inplace_merge(begin, mid, end);
 
