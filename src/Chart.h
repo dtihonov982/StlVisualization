@@ -1,9 +1,51 @@
+#ifndef CHART_H
+#define CHART_H
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
 #include <cassert>
 #include <SDL2/SDL.h>
 
+#include "Common.h"
+
+template<typename It>
+std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int max) {
+    using value_type = typename It::value_type;
+    size_t size = last - first;
+    std::vector<SDL_Rect> result;
+    if (size == 0)
+        return result;
+    if (size == 1)
+        return result;
+    if (size > area.w)
+        return result; //to many data to visualize in area
+
+    float rectWidth = area.w / (size + (size - 1) * gapRate);     
+    float gapWidth;
+    if (rectWidth >= 1.0f) {
+        gapWidth  = gapRate * rectWidth;
+    }
+    //If too many data for gape rate, change gape rate
+    else {
+        rectWidth = 1.0f;
+        gapWidth = static_cast<float>(area.w - size) / (size - 1);
+    }
+
+    float baseX = area.x;
+    float baseY = area.y + area.h;
+
+    while (first < last) {
+        float currH = *first * area.h / max;
+        SDL_Rect currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
+        result.push_back(currRect);
+        baseX += gapWidth + rectWidth;
+
+        ++first;
+    }
+
+    return result;
+}
 
 //TODO: draw method for element
 //TODO: SDL_Rect instead x, y, ...
@@ -76,46 +118,17 @@ public:
     template <typename It>
     void update(It begin, It end) {
         elements_.clear();
-        int sz = end - begin;
 
-        if (sz == 0)
+        if (end - begin <= 0)
             return;
 
+        SDL_Rect area{x_, y_, w_, h_};
         int max = *std::max_element(begin, end);
+        auto rectangles = emplace(area, begin, end, gapRate_, max);
 
-        if (sz == 1)
-            return;
-        
-        if (sz > w_)
-            return; //to many data
-        
-
-        float rectWidth = w_ / (sz + (sz - 1) * gapRate_ );     
-        float gapWidth;
-        //If too many data for gape rate, change gape rate
-        if (rectWidth < 1.0f) {
-            rectWidth = 1.0f;
-            gapWidth = static_cast<float>(w_ - sz) / (sz - 1);
+        for (auto& rect: rectangles) {
+            elements_.emplace_back(rect.x, rect.y, rect.w, rect.h, defaultElementColor_);
         }
-        else {
-            gapWidth  = gapRate_ * rectWidth;
-        }
-
-        float scale = static_cast<float>(h_) / max;
-
-        float baseX = x_;
-        float baseY = y_ + h_;
-
-        float currentH = *begin * h_ / max;
-        elements_.emplace_back(baseX, baseY - currentH, rectWidth, currentH, defaultElementColor_);
-
-        for (auto it = begin + 1; it != end; ++it) {
-            baseX += gapWidth + rectWidth;
-            currentH = *it * h_ / max; //???
-            elements_.emplace_back(baseX, baseY - currentH, rectWidth, currentH, defaultElementColor_);
-        }
-
-        assert(sz == elements_.size());
     }
 
     void setElementColor(int pos, const SDL_Color& color) {
@@ -158,3 +171,5 @@ private:
     SDL_Color defaultElementColor_ = { 0xff, 0x63, 0x61, 255};
     float gapRate_ = 2.0f; //gapRate_ = gapWidth / elementWidth;
 };
+
+#endif //CHART_H

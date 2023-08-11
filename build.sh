@@ -1,7 +1,7 @@
 #!/bin/bash
 
 OPTIONS="-g -Wall"
-VISUAL_SRC="src/testApp.cpp src/App.cpp src/Journal.cpp"
+VISUAL_SRC="src/testApp.cpp src/App.cpp src/Journal.cpp src/Common.cpp"
 LOGGER_SRC="src/logger.cpp src/Common.cpp"
 
 if [ $# = 0 ]
