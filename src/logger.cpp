@@ -245,6 +245,43 @@ TEST(std_algorithm, inplace_merge) {
     logger.finalize();
 }
 
+TEST(std_algorithm, up_low_bound) {
+    std::vector<int> data = getRandVector(30, 1, 300);
+    std::vector<int> equal(20, 150);
+    data.insert(data.end(), equal.begin(), equal.end());
+
+    std::sort(data.begin(), data.end());
+
+    //lower bound
+    {
+    std::ofstream file{getPath("lower_bound")};
+    file << "lower bound\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+
+    auto it = std::lower_bound(begin, end, 150);
+    EXPECT_EQ(*it, 150);
+    }
+
+    //upper_bound
+    {
+    std::ofstream file{getPath("upper_bound")};
+    file << "upper bound\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+
+    auto it = std::upper_bound(begin, end, 150);
+    EXPECT_GT(*it, 150);
+
+    logger.finalize();
+    }
+    
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
