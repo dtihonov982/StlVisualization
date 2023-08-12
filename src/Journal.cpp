@@ -12,13 +12,20 @@ std::vector<std::string> split(const std::string& input, char delim) {
     return result;
 }
 
-Journal readJournal(std::istream& is, char delim) {
-    Journal result;
+std::vector<Action> readJournal(std::istream& is, char delim) {
+    std::vector<Action> journal;
     for (std::string line; std::getline(is, line);) {
         auto entry = split(line, delim);
-        result.push_back(std::move(entry));
+        int pos = std::stoi(entry[1]);
+        if (entry[0] == "access") {
+            journal.push_back({Action::MARK, pos, 0});
+        }
+        else if (entry[0] == "write") {
+            int value = std::stoi(entry[2]);
+            journal.push_back({Action::WRITE, pos, value});
+        }
     }
-    return result;
+    return journal;
 }
 
 std::vector<int> loadDataFromDump(const std::string& dump, char delim) {

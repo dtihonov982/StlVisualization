@@ -44,30 +44,24 @@ void App::update() {
         return;
 
     //back colors to default
+    //TODO: do not drop marked before writing?
     while (!markedPos_.empty()) {
         chart_.resetElementColor(markedPos_.top());
         markedPos_.pop();
     }
 
     auto entry = *currentEntry_;
-    //TODO:double condition checking
     //TODO: many changes at one time for fast displaying of long arrays
-    if (entry[0] == "access") {
-        //std::cout << "reading at " << entry[1] << " position\n";
-        int pos = std::stoi(entry[1]);
-        chart_.setElementColor(pos, {255, 255, 255, 255});
-        markedPos_.push(pos);
+    if (entry.type == Action::MARK) {
+        chart_.setElementColor(entry.pos, {255, 255, 255, 255});
+        markedPos_.push(entry.pos);
     }
-    else if (entry[0] == "write") {
-        //std::cout << "writing a " << entry[2] << " in " << entry[1] << " position\n";
-        //TODO: doubling code
-        int pos = std::stoi(entry[1]);
-        int value = std::stoi(entry[2]);
-        data_[pos] = value;
+    else if (entry.type == Action::WRITE) {
+        data_[entry.pos] = entry.value;
         chart_.update(data_.begin(), data_.end());
 
-        chart_.setElementColor(pos, {255, 255, 255, 255});
-        markedPos_.push(pos);
+        chart_.setElementColor(entry.pos, {255, 255, 255, 255});
+        markedPos_.push(entry.pos);
     }
 
     ++currentEntry_;
