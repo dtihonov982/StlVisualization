@@ -2,6 +2,22 @@
 #include <fstream>
 
 
+std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float gapRatio) {
+    std::vector<SDL_Rect> blocks;
+    int blockWidth = width * gapRatio;
+    int gap = (width - blockWidth) / 2;
+    int blockHeight = (height - gap * (count + 1)) / count;
+    for (int i = 0; i < count; ++i) {
+        SDL_Rect curr;
+        curr.x = gap;
+        curr.y = gap + i * (blockHeight + gap);
+        curr.w = blockWidth;
+        curr.h = blockHeight;
+        blocks.push_back(curr);
+    }
+    return blocks;
+}
+
 App::App(std::string_view logfile) {
     std::ifstream file{logfile.data()};
     if (!file.is_open()) {
@@ -9,16 +25,17 @@ App::App(std::string_view logfile) {
     }
     std::string title;
     std::getline(file, title);
+
     std::string dump;
     std::getline(file, dump);
     std::vector<int> data = loadDataFromDump(dump, ',');
+
     Script script = readScript(file , ',');
     
-    std::string windowTitle = "STL visualization";
     int windowWidth = 800;
     int windowHeight = 640;
-
     float chartAreaRatio = 0.80f;
+
     int chartWidth = static_cast<int>(windowWidth * chartAreaRatio);
     int chartHeight = static_cast<int>(windowHeight * chartAreaRatio);
     int chartX = (windowWidth - chartWidth) / 2;
@@ -38,7 +55,8 @@ App::App(std::string_view logfile) {
 }
 
 void App::update() {
-    players_[0].update();
+    for (auto& player: players_)
+        player.update();
 }
 
 void App::handleEvents() {
@@ -57,7 +75,8 @@ void App::handleKeyDown(SDL_Event& event) {
         isRunning_ = false; 
         break;
     case SDLK_SPACE: 
-        players_[0].toggleStatus();
+        for (auto& player: players_)
+            player.toggleStatus();
         break;
     }
 }
@@ -66,7 +85,8 @@ void App::render() {
     SDL_SetRenderDrawColor(renderer_, 0x00,   0x3f,   0x5c, 255);
     SDL_RenderClear(renderer_);
 
-    players_[0].draw(renderer_);
+    for (auto& player: players_)
+        player.draw(renderer_);
 
     SDL_RenderPresent(renderer_);
 }

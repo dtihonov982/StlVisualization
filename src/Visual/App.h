@@ -18,6 +18,11 @@ public:
     void handleEvents();
     void handleKeyDown(SDL_Event& event);
     bool isRunning() { return isRunning_; }
+    static std::vector<SDL_Rect>
+    emplaceBlocks(int count, 
+                  int width, 
+                  int height, 
+                  float gapRatio = 0.90f);
 private:
     std::vector<Player> players_;
     SDL_Window* window_;
