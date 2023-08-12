@@ -7,12 +7,12 @@ App::App(std::string_view logfile) {
     if (!file.is_open()) {
         return;
     }
-    std::getline(file, title_);
+    std::string title;
+    std::getline(file, title);
     std::string dump;
     std::getline(file, dump);
-    data_ = loadDataFromDump(dump, ',');
-    script_ = readScript(file , ',');
-    currentAction_ = script_.begin();
+    std::vector<int> data = loadDataFromDump(dump, ',');
+    Script script = readScript(file , ',');
     
     std::string windowTitle = "STL visualization";
     int windowWidth = 800;
@@ -25,12 +25,10 @@ App::App(std::string_view logfile) {
     int chartY = (windowHeight - chartHeight) / 2;
     SDL_Rect rect {chartX, chartY, chartWidth, chartHeight};
 
-    chart_.setGeometry(rect);
-    chart_.update(data_.begin(), data_.end());
-
+    players_.emplace_back(rect, title, data, script);
     
     SDL_Init(SDL_INIT_EVERYTHING);
-    window_ = SDL_CreateWindow(title_.data(), 
+    window_ = SDL_CreateWindow(title.data(), 
                     SDL_WINDOWPOS_CENTERED, 
                     SDL_WINDOWPOS_CENTERED, 
                     windowWidth, windowHeight, 0);
@@ -40,34 +38,7 @@ App::App(std::string_view logfile) {
 }
 
 void App::update() {
-    if (status_ == Pause || status_ == Done)
-        return;
-
-    //back colors to default
-    //TODO: do not drop marked before writing?
-    while (!markedPos_.empty()) {
-        chart_.resetElementColor(markedPos_.top());
-        markedPos_.pop();
-    }
-
-    auto action = *currentAction_;
-    //TODO: many changes at one time for fast displaying of long arrays
-    if (action.type == Action::ACCESS) {
-        chart_.setElementColor(action.pos, {255, 255, 255, 255});
-        markedPos_.push(action.pos);
-    }
-    else if (action.type == Action::WRITE) {
-        data_[action.pos] = action.value;
-        chart_.update(data_.begin(), data_.end());
-
-        chart_.setElementColor(action.pos, {255, 255, 255, 255});
-        markedPos_.push(action.pos);
-    }
-
-    ++currentAction_;
-
-    if (currentAction_ >= script_.end())
-        status_ = Done;
+    players_[0].update();
 }
 
 void App::handleEvents() {
@@ -86,17 +57,8 @@ void App::handleKeyDown(SDL_Event& event) {
         isRunning_ = false; 
         break;
     case SDLK_SPACE: 
-        if (status_ == Done) {
-            break;
-        }
-        else if (status_ == Play) {
-            status_ = Pause;
-            break;
-        }
-        else if (status_ == Pause) {
-            status_ = Play;
-            break;
-        }
+        players_[0].toggleStatus();
+        break;
     }
 }
 
@@ -104,7 +66,7 @@ void App::render() {
     SDL_SetRenderDrawColor(renderer_, 0x00,   0x3f,   0x5c, 255);
     SDL_RenderClear(renderer_);
 
-    chart_.draw(renderer_);
+    players_[0].draw(renderer_);
 
     SDL_RenderPresent(renderer_);
 }

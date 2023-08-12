@@ -7,11 +7,10 @@
 #include "Chart.h"
 #include "Script.h"
 #include <stack>
+#include "Player.h"
 
 class App {
 public:
-    enum Status { Play, Pause, Done };
-    //TODO: Config file
     App(std::string_view logfile);
     ~App();
     void update();
@@ -19,19 +18,10 @@ public:
     void handleEvents();
     void handleKeyDown(SDL_Event& event);
     bool isRunning() { return isRunning_; }
-    Status getStatus() { return status_;  }
-    void setStatus(Status status) { status_ = status; }
 private:
+    std::vector<Player> players_;
     SDL_Window* window_;
     SDL_Renderer* renderer_;
-    std::string title_;
-    std::vector<int> data_;
-    std::stack<int> markedPos_;
-    Script script_;
-    typename Script::iterator currentAction_;
-    Chart chart_;
     bool isRunning_ = false;
-    //Runs paused. Starts with Space.
-    Status status_ = Pause;
 };
 #endif // APP_H

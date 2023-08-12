@@ -1,7 +1,7 @@
 #!/bin/bash
 
 OPTIONS="-g -Wall"
-VISUAL_SRC="src/Visual/main.cpp src/Visual/App.cpp src/Common/Script.cpp src/Common/Common.cpp"
+VISUAL_SRC="src/Visual/main.cpp src/Visual/App.cpp src/Visual/Player.cpp src/Common/Script.cpp src/Common/Common.cpp"
 HEADERS="-Isrc/Visual -Isrc/Common"
 
 set -x
