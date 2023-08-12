@@ -1,4 +1,4 @@
-#include "Journal.h"
+#include "Script.h"
 #include <cassert>
 #include <sstream>
 
@@ -12,20 +12,21 @@ std::vector<std::string> split(const std::string& input, char delim) {
     return result;
 }
 
-std::vector<Action> readJournal(std::istream& is, char delim) {
-    std::vector<Action> journal;
+std::vector<Action> readScript(std::istream& is, char delim) {
+    std::vector<Action> script;
     for (std::string line; std::getline(is, line);) {
         auto entry = split(line, delim);
         int pos = std::stoi(entry[1]);
+        assert(pos >= 0);
         if (entry[0] == "access") {
-            journal.push_back({Action::MARK, pos, 0});
+            script.push_back({Action::ACCESS, pos, 0});
         }
         else if (entry[0] == "write") {
             int value = std::stoi(entry[2]);
-            journal.push_back({Action::WRITE, pos, value});
+            script.push_back({Action::WRITE, pos, value});
         }
     }
-    return journal;
+    return script;
 }
 
 std::vector<int> loadDataFromDump(const std::string& dump, char delim) {

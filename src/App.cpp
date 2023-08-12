@@ -11,8 +11,8 @@ App::App(std::string_view logfile) {
     std::string dump;
     std::getline(file, dump);
     data_ = loadDataFromDump(dump, ',');
-    journal_ = readJournal(file , ',');
-    currentEntry_ = journal_.begin();
+    script_ = readScript(file , ',');
+    currentAction_ = script_.begin();
     
     std::string windowTitle = "STL visualization";
     int windowWidth = 800;
@@ -50,23 +50,23 @@ void App::update() {
         markedPos_.pop();
     }
 
-    auto entry = *currentEntry_;
+    auto action = *currentAction_;
     //TODO: many changes at one time for fast displaying of long arrays
-    if (entry.type == Action::MARK) {
-        chart_.setElementColor(entry.pos, {255, 255, 255, 255});
-        markedPos_.push(entry.pos);
+    if (action.type == Action::ACCESS) {
+        chart_.setElementColor(action.pos, {255, 255, 255, 255});
+        markedPos_.push(action.pos);
     }
-    else if (entry.type == Action::WRITE) {
-        data_[entry.pos] = entry.value;
+    else if (action.type == Action::WRITE) {
+        data_[action.pos] = action.value;
         chart_.update(data_.begin(), data_.end());
 
-        chart_.setElementColor(entry.pos, {255, 255, 255, 255});
-        markedPos_.push(entry.pos);
+        chart_.setElementColor(action.pos, {255, 255, 255, 255});
+        markedPos_.push(action.pos);
     }
 
-    ++currentEntry_;
+    ++currentAction_;
 
-    if (currentEntry_ >= journal_.end())
+    if (currentAction_ >= script_.end())
         status_ = Done;
 }
 

@@ -5,7 +5,7 @@
 #include <string_view>
 #include <string>
 #include "Chart.h"
-#include "Journal.h"
+#include "Script.h"
 #include <stack>
 
 class App {
@@ -27,8 +27,8 @@ private:
     std::string title_;
     std::vector<int> data_;
     std::stack<int> markedPos_;
-    Journal journal_;
-    typename Journal::iterator currentEntry_;
+    Script script_;
+    typename Script::iterator currentAction_;
     Chart chart_;
     bool isRunning_ = false;
     //Runs paused. Starts with Space.
