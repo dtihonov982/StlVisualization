@@ -9,7 +9,7 @@
 
 #include "Common.h"
 
-//build a set of rectangles in area what represents [first; last) as a chart diagram
+//return rectangles what fills area and represents [first; last) as a chart diagram
 template<typename It>
 std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int maxSize, int maxValue) {
     size_t size = last - first;
@@ -22,6 +22,7 @@ std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, i
     if (maxSize > area.w)
         return result; //to many data to visualize in area
 
+    //use float not integer to avoid from rounding routine in emplace logic
     float rectWidth = area.w / (maxSize + (maxSize - 1) * gapRate);     
     float gapWidth;
     if (rectWidth >= 1.0f) {
@@ -33,12 +34,15 @@ std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, i
         gapWidth = static_cast<float>(area.w - maxSize) / (maxSize - 1);
     }
 
+    //SDL requires coordinates for top left corner of each rectangle
+    //for computations use down left coordinates (base)
     float baseX = area.x;
     float baseY = area.y + area.h;
 
     while (first < last) {
         assert(*first <= maxValue);
         float currH = *first * area.h / maxValue;
+        //after evaluations coordinates transfers from base to top-left
         SDL_Rect currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
         result.push_back(currRect);
         baseX += gapWidth + rectWidth;
