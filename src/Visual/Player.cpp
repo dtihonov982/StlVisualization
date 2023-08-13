@@ -9,15 +9,26 @@ Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {
         throw Exception("Can not open file: ", filename);
 
     std::string title;
-    std::getline(file, title);
+    if(!std::getline(file, title))
+        throw Exception("Title reading error.");
 
     std::string dump;
-    std::getline(file, dump);
-    std::vector<int> data = loadDataFromDump(dump, ',');
+    if(!std::getline(file, dump))
+        throw Exception("Data reading error.");
+
+
+    std::vector<int> data; 
+    try { 
+        data = loadDataFromDump(dump, ',');
+    }
+    catch (const Exception& ex) {
+        std::cerr << "Data parsing error.";
+        throw ex;
+    }
 
     Script script;
     try {
-        script = readScript(file , ',');
+        script = readScript(file, ',');
     }
     catch (const Exception& ex) {
         std::cerr << "Can not create script from file " << filename << "\n";

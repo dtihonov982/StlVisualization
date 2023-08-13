@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include "Common.h"
+#include "Exception.h"
 
 //return rectangles what fills area and represents [first; last) as a chart diagram
 template<typename It>
@@ -40,13 +41,20 @@ std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, i
     float baseY = area.y + area.h;
 
     while (first < last) {
-        assert(*first <= maxValue);
-        float currH = *first * area.h / maxValue;
-        //after evaluations coordinates transfers from base to top-left
-        SDL_Rect currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
+        int currValue = *first;
+        assert(currValue <= maxValue);
+        SDL_Rect currRect;
+        if (currValue != 0) {
+            float currH = currValue * area.h / maxValue;
+            //after evaluations coordinates transfers from base to top-left
+            currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
+        }
+        else {
+            currRect = roundRect(baseX, baseY, rectWidth, 0.0f);
+        }
         result.push_back(currRect);
-        baseX += gapWidth + rectWidth;
 
+        baseX += gapWidth + rectWidth;
         ++first;
     }
 
@@ -138,11 +146,17 @@ public:
     }
 
     void setElementColor(int pos, const SDL_Color& color) {
-        elements_[pos].color_ = color;
+        if (pos < elements_.size())
+            elements_[pos].color_ = color;
+        else 
+            throw Exception("Invalid chart element position ", pos, ".There is ", elements_.size(), " elements in chart.");
     }
 
     void resetElementColor(int pos) {
-        elements_[pos].color_ = defaultElementColor_;
+        if (pos < elements_.size())
+            elements_[pos].color_ = defaultElementColor_;
+        else 
+            throw Exception("Invalid chart element position ", pos, ".There is ", elements_.size(), " elements in chart.");
     }
 
     void setDefaultElementColor(const SDL_Color& color) {
