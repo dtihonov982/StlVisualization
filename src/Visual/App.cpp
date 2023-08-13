@@ -18,11 +18,9 @@ std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float
     return blocks;
 }
 
-App::App(std::string_view logfile) {
-    std::ifstream file{logfile.data()};
-    if (!file.is_open()) {
-        return;
-    }
+Player makePlayer(const SDL_Rect& rect, std::string_view filename) {
+    std::ifstream file{filename.data()};
+
     std::string title;
     std::getline(file, title);
 
@@ -31,21 +29,27 @@ App::App(std::string_view logfile) {
     std::vector<int> data = loadDataFromDump(dump, ',');
 
     Script script = readScript(file , ',');
+
+    return Player(rect, title, data, script);
+}
+
+App::App(std::string_view logfile) {
     
     int windowWidth = 800;
     int windowHeight = 640;
-    float chartAreaRatio = 0.80f;
-
+#if 0
     int chartWidth = static_cast<int>(windowWidth * chartAreaRatio);
     int chartHeight = static_cast<int>(windowHeight * chartAreaRatio);
     int chartX = (windowWidth - chartWidth) / 2;
     int chartY = (windowHeight - chartHeight) / 2;
     SDL_Rect rect {chartX, chartY, chartWidth, chartHeight};
+#endif
+    std::vector<SDL_Rect> blocks = emplaceBlocks(1, windowWidth, windowHeight);
 
-    players_.emplace_back(rect, title, data, script);
+    players_.push_back(makePlayer(blocks[0], logfile));
     
     SDL_Init(SDL_INIT_EVERYTHING);
-    window_ = SDL_CreateWindow(title.data(), 
+    window_ = SDL_CreateWindow("Title", 
                     SDL_WINDOWPOS_CENTERED, 
                     SDL_WINDOWPOS_CENTERED, 
                     windowWidth, windowHeight, 0);
