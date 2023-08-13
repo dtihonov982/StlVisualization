@@ -26,16 +26,30 @@ App::App(const std::vector<std::string_view>& files) {
     size_t count = files.size();
     std::vector<SDL_Rect> blocks = emplaceBlocks(count, windowWidth, windowHeight);
     for (size_t i = 0; i < count; ++i) {
-        Player curr = Player::makePlayer(blocks[i], files[i]);
-        players_.push_back(std::move(curr));
+        try {
+            Player curr = Player::makePlayer(blocks[i], files[i]);
+            players_.push_back(std::move(curr));
+        }
+        catch (const Exception& ex) {
+            std::cerr << "Error while creating player for " << files[i] << "\n";
+            throw ex;
+        }
     }
     
-    SDL_Init(SDL_INIT_EVERYTHING);
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        throw Exception("SDL initiation error.");
+    }
+
     window_ = SDL_CreateWindow("Title", 
                     SDL_WINDOWPOS_CENTERED, 
                     SDL_WINDOWPOS_CENTERED, 
                     windowWidth, windowHeight, 0);
+    if (!window_)
+        throw Exception("Window creating error.");
+
     renderer_ = SDL_CreateRenderer(window_, -1, 0);
+    if (!renderer_)
+        throw Exception("Renderer creating error.");
 
     isRunning_ = true;
 }

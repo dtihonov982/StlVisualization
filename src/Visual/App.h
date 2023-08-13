@@ -8,6 +8,7 @@
 #include "Script.h"
 #include <stack>
 #include "Player.h"
+#include "Exception.h"
 
 class App {
 public:

@@ -1,9 +1,12 @@
 #include "Player.h"
 #include <fstream>
+#include "Exception.h"
 
 
 Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {
     std::ifstream file{filename.data()};
+    if (!file)
+        throw Exception("Can not open file: ", filename);
 
     std::string title;
     std::getline(file, title);
