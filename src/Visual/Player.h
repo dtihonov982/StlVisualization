@@ -19,12 +19,13 @@ public:
     void toggleStatus();
     Status getStatus() { return status_;  }
     void setStatus(Status status) { status_ = status; }
+    static Player makePlayer(const SDL_Rect& rect, std::string_view filename);
 private:
     std::string title_;
     std::vector<int> data_;
     std::stack<int> markedPos_;
     Script script_;
-    typename Script::iterator currentAction_;
+    size_t currScriptPos_ = 0;
     Chart chart_;
     //Runs paused. Starts with Space.
     Status status_ = Pause;

@@ -2,6 +2,21 @@
 #include <fstream>
 
 
+Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {
+    std::ifstream file{filename.data()};
+
+    std::string title;
+    std::getline(file, title);
+
+    std::string dump;
+    std::getline(file, dump);
+    std::vector<int> data = loadDataFromDump(dump, ',');
+
+    Script script = readScript(file , ',');
+
+    return Player(rect, title, data, script);
+}
+
 Player::Player(const SDL_Rect& geom, 
                const std::string& title, 
                const std::vector<int>& data, 
@@ -9,7 +24,6 @@ Player::Player(const SDL_Rect& geom,
 : title_(title)
 , data_(data)
 , script_(script) 
-, currentAction_(script_.begin())
 {
     chart_.setGeometry(geom);
     chart_.update(data_.begin(), data_.end());
@@ -20,14 +34,12 @@ void Player::update() {
         return;
 
     //back colors to default
-    //TODO: do not drop marked before writing?
     while (!markedPos_.empty()) {
         chart_.resetElementColor(markedPos_.top());
         markedPos_.pop();
     }
 
-    auto action = *currentAction_;
-    //TODO: many changes at one time for fast displaying of long arrays
+    Action action = script_[currScriptPos_];
     if (action.type == Action::ACCESS) {
         chart_.setElementColor(action.pos, {255, 255, 255, 255});
         markedPos_.push(action.pos);
@@ -40,9 +52,9 @@ void Player::update() {
         markedPos_.push(action.pos);
     }
 
-    ++currentAction_;
+    ++currScriptPos_;
 
-    if (currentAction_ >= script_.end())
+    if (currScriptPos_ >= script_.size())
         status_ = Done;
 }
 

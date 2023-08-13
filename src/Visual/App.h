@@ -11,7 +11,7 @@
 
 class App {
 public:
-    App(std::string_view logfile);
+    App(const std::vector<std::string_view>& files);
     ~App();
     void update();
     void render();

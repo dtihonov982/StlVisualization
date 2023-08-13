@@ -18,35 +18,17 @@ std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float
     return blocks;
 }
 
-Player makePlayer(const SDL_Rect& rect, std::string_view filename) {
-    std::ifstream file{filename.data()};
-
-    std::string title;
-    std::getline(file, title);
-
-    std::string dump;
-    std::getline(file, dump);
-    std::vector<int> data = loadDataFromDump(dump, ',');
-
-    Script script = readScript(file , ',');
-
-    return Player(rect, title, data, script);
-}
-
-App::App(std::string_view logfile) {
+App::App(const std::vector<std::string_view>& files) {
     
-    int windowWidth = 800;
+    int windowWidth = 1024;
     int windowHeight = 640;
-#if 0
-    int chartWidth = static_cast<int>(windowWidth * chartAreaRatio);
-    int chartHeight = static_cast<int>(windowHeight * chartAreaRatio);
-    int chartX = (windowWidth - chartWidth) / 2;
-    int chartY = (windowHeight - chartHeight) / 2;
-    SDL_Rect rect {chartX, chartY, chartWidth, chartHeight};
-#endif
-    std::vector<SDL_Rect> blocks = emplaceBlocks(1, windowWidth, windowHeight);
 
-    players_.push_back(makePlayer(blocks[0], logfile));
+    size_t count = files.size();
+    std::vector<SDL_Rect> blocks = emplaceBlocks(count, windowWidth, windowHeight);
+    for (size_t i = 0; i < count; ++i) {
+        Player curr = Player::makePlayer(blocks[i], files[i]);
+        players_.push_back(std::move(curr));
+    }
     
     SDL_Init(SDL_INIT_EVERYTHING);
     window_ = SDL_CreateWindow("Title", 

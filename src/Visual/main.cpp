@@ -1,21 +1,22 @@
 #include "App.h"
 #include <string>
+#include <iostream>
+#include <string_view>
+#include <vector>
 
 int main(int argc, char** argv) {
-    if (argc < 2)
+    if (argc < 3) {
+        std::cout << "Usage: visual fps file1 file2 ... fileN\n";
         return 0;
-    //TODO: CLI argument file to read
-    App app(argv[1]);
-    int fps;
-    if (argc > 2) {
-        fps = std::stoi(argv[2]);
     }
-    else {
-        fps = 25;
-    }
+    int fps = std::stoi(argv[1]);
+
+    std::vector<std::string_view> filenames(argv + 2, argv + argc);
+    App app(filenames);
+
     const int frameDelay = 1000 / fps;
-    Uint32 frameStart;
-    Uint32 frameTime;
+    int frameStart;
+    int frameTime;
     while (app.isRunning()) {
         frameStart = SDL_GetTicks();
         

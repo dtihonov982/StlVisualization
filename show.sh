@@ -7,5 +7,5 @@ then
 fi
 
 cd bin
-./visual logs/$1.txt
+./visual 60 logs/$1.txt
 cd ..
