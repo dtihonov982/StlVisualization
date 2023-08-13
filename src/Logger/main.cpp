@@ -298,22 +298,95 @@ TEST(std_algorithm, up_low_bound) {
     }
 }
 
+TEST(std_algorithm, reduce_accumulate) {
+    std::vector<int> data = getRandVector(50, 1, 1000);
+    int sum = std::accumulate(data.begin(), data.end(), 0);
+
+    {
+    std::ofstream file{getPath("reduce")};
+    file << "reduce\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+    int res = std::reduce(begin, end);
+    EXPECT_EQ(res, sum);
+
+    logger.finalize();
+    }
+    
+    {
+    std::ofstream file{getPath("accumulate")};
+    file << "accumulate\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+    int res = std::accumulate(begin, end, 0);
+    EXPECT_EQ(res, sum);
+
+    logger.finalize();
+    }
+}
+
+TEST(std_algorithm, scan) {
+    std::vector<int> data = getRandVector(10, 1, 1000);
+    int sum = std::accumulate(data.begin(), data.end(), 0);
+
+    {
+    //input data
+    std::ofstream file{getPath("inclusive_scan")};
+    file << "inclusive scan\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+
+    //output data
+    std::vector<int> result(10);
+    std::ofstream file_result{getPath("inclusive_scan_result")};
+    file_result << "inclusive scan result\n" << result << '\n';
+
+    AccessLogger logger_result{result, file_result};
+
+    auto [begin_result, end_result] = getNI(result, logger_result);
+
+    //algorithm
+    std::inclusive_scan(begin, end, begin_result);
+
+    logger.finalize();
+    logger_result.finalize();
+    }
+    
+    {
+    std::ofstream file{getPath("partial_sum")};
+    file << "partial sum\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+    std::partial_sum(begin, end, begin);
+
+    logger.finalize();
+    }
+
+    {
+    std::ofstream file{getPath("exclusive_scan")};
+    file << "exclusive scan\n" << data << '\n';
+
+    AccessLogger logger{data, file};
+
+    auto [begin, end] = getNI(data, logger);
+    std::exclusive_scan(begin, end, begin, 0);
+
+    logger.finalize();
+    }
+    
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-
-#if 0
-    sort();
-    nth_element();
-    partial_sort();
-    partial_sum();
-    rotate();
-    transform();
-    unique();
-    reverse();
-    search();
-    inplace_merge();
-#endif
 
     //std::random_device rd;
     //std::mt19937 g(rd());
