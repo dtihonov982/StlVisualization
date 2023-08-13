@@ -1,6 +1,7 @@
 #include "Script.h"
 #include <cassert>
 #include <sstream>
+#include "Exception.h"
 
 std::vector<std::string> split(const std::string& input, char delim) {
     std::istringstream iss{input};
@@ -24,6 +25,9 @@ std::vector<Action> readScript(std::istream& is, char delim) {
         else if (entry[0] == "write") {
             int value = std::stoi(entry[2]);
             script.push_back({Action::WRITE, pos, value});
+        }
+        else {
+            throw Exception("Unknow token ", entry[0], " in line ", line);
         }
     }
     return script;

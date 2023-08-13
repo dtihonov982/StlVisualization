@@ -15,7 +15,14 @@ Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {
     std::getline(file, dump);
     std::vector<int> data = loadDataFromDump(dump, ',');
 
-    Script script = readScript(file , ',');
+    Script script;
+    try {
+        script = readScript(file , ',');
+    }
+    catch (const Exception& ex) {
+        std::cerr << "Can not create script from file " << filename << "\n";
+        throw ex;
+    }
 
     return Player(rect, title, data, script);
 }
