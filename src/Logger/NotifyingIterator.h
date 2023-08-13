@@ -115,6 +115,13 @@ public:
         return *this;
     }
 
+    NotifyingIterator operator ++ (int) {
+        sendMessage("NotifyingIterator operator ++ (int)");
+        NotifyingIterator copy{*this};
+        *this += 1;
+        return copy;
+    }
+
     NotifyingIterator & operator -- () {
         *this -= 1;
         return *this;
