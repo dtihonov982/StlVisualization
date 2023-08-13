@@ -12,7 +12,7 @@
 //return rectangles what fills area and represents [first; last) as a chart diagram
 template<typename It>
 std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int maxSize, int maxValue) {
-    size_t size = last - first;
+    int size = last - first;
     assert(size <= maxSize);
     std::vector<SDL_Rect> result;
     if (size == 0)

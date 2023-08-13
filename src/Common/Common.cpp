@@ -2,6 +2,7 @@
 
 #include <random>
 #include <vector>
+#include <cmath>
 
 std::vector<int> getRandVector(int size, int min, int max) {
     std::random_device dev;
@@ -17,7 +18,7 @@ std::vector<int> getRandVector(int size, int min, int max) {
 }
 
 SDL_Rect roundRect(float x, float y, float w, float h) {
-    return {static_cast<float>(x), static_cast<float>(y),
-            static_cast<float>(w), static_cast<float>(h) };
+    return {static_cast<int>(x), static_cast<int>(y),
+            static_cast<int>(w), static_cast<int>(h) };
 }
 
