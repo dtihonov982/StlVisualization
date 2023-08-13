@@ -8,7 +8,7 @@
 struct Action {
     enum Type { ACCESS, WRITE };
     Type type;
-    int pos;
+    size_t pos;
     int value;
 };
 

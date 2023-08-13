@@ -17,16 +17,17 @@ std::vector<Action> readScript(std::istream& is, char delim) {
     std::vector<Action> script;
     for (std::string line; std::getline(is, line);) {
         auto entry = split(line, delim);
-        int pos; 
+        int rawPos; 
         try {
-            pos = std::stoi(entry[1]);
+            rawPos = std::stoi(entry[1]);
         }
         catch (const std::invalid_argument& ex) {
             throw Exception("Error conversion to int: ", entry[1]);
         }
-        if (pos < 0) {
+        if (rawPos < 0) {
             throw Exception("Negative position.");
         }
+        size_t pos = static_cast<size_t>(rawPos);
         if (entry[0] == "access") {
             script.push_back({Action::ACCESS, pos, 0});
         }

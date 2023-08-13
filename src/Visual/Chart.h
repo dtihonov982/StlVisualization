@@ -145,14 +145,14 @@ public:
         }
     }
 
-    void setElementColor(int pos, const SDL_Color& color) {
+    void setElementColor(size_t pos, const SDL_Color& color) {
         if (pos < elements_.size())
             elements_[pos].color_ = color;
         else 
             throw Exception("Invalid chart element position ", pos, ".There is ", elements_.size(), " elements in chart.");
     }
 
-    void resetElementColor(int pos) {
+    void resetElementColor(size_t pos) {
         if (pos < elements_.size())
             elements_[pos].color_ = defaultElementColor_;
         else 
