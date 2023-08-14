@@ -51,20 +51,19 @@ std::string getPath(std::string_view algoName) {
 class Case {
 public:
     using Container = std::vector<int>;
-    Case(const Container& data, std::string_view name, std::string_view info)
+    Case(const Container& data, 
+         std::string_view name, 
+         const AccessLogger<Container>::time_point& startPoint = std::chrono::high_resolution_clock::now())
     : data_(data)
     , name_(name)
-    , info_(info)
+    , info_(name)
     , file_(getPath(name))
-    , logger_(data_, file_) {
+    , logger_(data_, file_, startPoint) {
         if (!file_)
             throw Exception("Can't open file ", getPath(name));
-        file_ << info << "\n";
+        file_ << info_ << "\n";
         file_ << data_ << "\n";
     }
-
-    Case(const Container& data, std::string_view name)
-    : Case(data, name, name) {}
 
     //return two NotifyingIterators to begin and end of the data
     std::pair<NIter, NIter> getIterators() {
@@ -378,13 +377,14 @@ TEST(std_algorithm, scan) {
     //int sum = std::accumulate(data.begin(), data.end(), 0);
 
     try {
+        auto startPoint = std::chrono::high_resolution_clock::now();
         //input data
-        Case srcCase(data, "inclusive_scan");
+        Case srcCase(data, "inclusive_scan", startPoint);
         auto [begin, end] = srcCase.getIterators();
 
         //output data
         std::vector<int> result(10);
-        Case dstCase(result, "inclusive_scan_result");
+        Case dstCase(result, "inclusive_scan_result", startPoint);
 
         auto [beginDst, endDst] = dstCase.getIterators();
 
