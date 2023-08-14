@@ -11,6 +11,7 @@
 #include "Exception.h"
 
 //return rectangles what fills area and represents [first; last) as a chart diagram
+//TODO: Does it need maxSize? It will be change?
 template<typename It>
 std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int maxSize, int maxValue) {
     int size = last - first;
