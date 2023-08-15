@@ -616,6 +616,41 @@ TEST(std_algorithm, set) {
     }
     
 }
+
+namespace my {
+template<typename It>
+It copy(It begin_src, It end_src, It begin_dst) {
+    for (; begin_src < end_src; ++begin_src) {
+        *begin_dst = *begin_src;
+        ++begin_dst;
+    }
+    return begin_dst;
+}
+} //my
+
+TEST(my_algorithm, copy) {
+    std::vector<int> src(3, 101);
+    std::vector<int> dst(3);
+    try {
+        auto startPoint = std::chrono::high_resolution_clock::now();
+        //input data
+        Case srcCase(src, "my_copy_src", startPoint);
+        auto [beginSrc, endSrc] = srcCase.getIterators();
+
+        Case dstCase(dst, "my_copy_dst", startPoint);
+        auto [beginDst, endDst] = dstCase.getIterators();
+
+        //algorithm
+        my::copy(beginSrc, endSrc, beginDst);
+        srcCase.finalize();
+        dstCase.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
