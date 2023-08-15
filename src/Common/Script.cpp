@@ -19,24 +19,24 @@ std::vector<Action> readScript(std::istream& is, char delim) {
         auto entry = split(line, delim);
         int rawPos; 
         try {
-            rawPos = std::stoi(entry[1]);
+            rawPos = std::stoi(entry[2]);
         }
         catch (const std::invalid_argument& ex) {
-            throw Exception("Error conversion to int: ", entry[1]);
+            throw Exception("Error conversion to int: ", entry[2]);
         }
         if (rawPos < 0) {
             throw Exception("Negative position.");
         }
         size_t pos = static_cast<size_t>(rawPos);
-        if (entry[0] == "access") {
+        if (entry[1] == "access") {
             script.push_back({Action::ACCESS, pos, 0});
         }
-        else if (entry[0] == "write") {
-            int value = std::stoi(entry[2]);
+        else if (entry[1] == "write") {
+            int value = std::stoi(entry[3]);
             script.push_back({Action::WRITE, pos, value});
         }
         else {
-            throw Exception("Unknow token ", entry[0], " in line ", line);
+            throw Exception("Unknow token ", entry[1], " in line ", line);
         }
     }
     return script;
