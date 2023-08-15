@@ -24,6 +24,7 @@ int main() {
 
     TTF_Init();
 
+    {
     Label label(renderer, 10, 10, "This is a text!\nWHOOOAAA!",
                 "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
                 , 14, {0xff, 0xff, 0xff, 0xff});
@@ -31,7 +32,9 @@ int main() {
 
 	SDL_RenderPresent(renderer);
     SDL_Delay(3000);
+    }
 	SDL_DestroyWindow(window);
+    std::cerr << SDL_GetError() << "\n";
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 
