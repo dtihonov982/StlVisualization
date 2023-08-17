@@ -4,6 +4,8 @@
 #include <random>
 #include <iostream>
 #include <vector>
+#include <string_view>
+
 #include <SDL2/SDL.h> 
 
 std::vector<int> getRandVector(int size, int min, int max);
@@ -20,6 +22,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
     }
     return os;
 }
+
 
 SDL_Rect roundRect(float x, float y, float w, float h);
 #endif // COMMON_H
