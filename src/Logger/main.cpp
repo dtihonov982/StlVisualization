@@ -626,6 +626,14 @@ It copy(It begin_src, It end_src, It begin_dst) {
     }
     return begin_dst;
 }
+
+template<typename It>
+void double_each(It first, It last) {
+    for (; first < last; ++first) {
+        *first *= 2; 
+    }
+}
+
 } //my
 
 TEST(my_algorithm, copy) {
@@ -651,38 +659,26 @@ TEST(my_algorithm, copy) {
 
 }
 
+
+TEST(my_algorithm, double_each) {
+    std::vector<int> src(3, 101);
+    try {
+        auto startPoint = std::chrono::high_resolution_clock::now();
+        //input data
+        Case case_(src, "double_each", startPoint);
+        auto [first, last] = case_.getIterators();
+
+        //algorithm
+        my::double_each(first, last);
+        case_.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-
-    //std::random_device rd;
-    //std::mt19937 g(rd());
-    //std::vector<int> data {10, 20};
-    //std::vector<int> data(100);
-    //std::iota(data.rbegin(), data.rend(), 0);
-    /*
-    for (int i = 0; i < 50; ++i) data.push_back(500);
-    std::vector<int> data(100);
-    std::iota(data.begin(), data.end(), 1);
-    
-    */
-
-
-    //std::sort(begin_, end_);
-    //std::rotate(begin_, middle_, end_);
-    //std::make_heap(begin_, middle_);
-    //std::sort_heap(begin_, middle_);
-    //std::find(begin_, end_, 10);
-    //std::partition(begin_, end_, [] (int x) { return x == 500; });
-    //std::shuffle(begin_, end_, g);
-    //int acc = std::accumulate(begin_, end_, 0);
-    //assert(acc == 45);
-    //std::iter_swap(begin_, begin_ + 1);
-    //std::lower_bound(begin_, end_, 10);
-    //assert(std::is_sorted(begin_, end_));
-    //assert(*std::max_element(begin_, end_) == 9);
-    //std::binary_search(begin_, end_, 1);
-
-
     return 0;
 }
