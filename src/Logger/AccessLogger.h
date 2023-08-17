@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "Exception.h"
+#include "Script.h"
 
 //AccessLogger logs changes in Container by using information aboud access to it.
 //After each access AccessLogger compares it's own version of Container and
@@ -42,7 +43,9 @@ public:
         checkWriting();
 
         Access& accEvent = static_cast<Access&>(event);
-        log_ << getTime() << ",access," << accEvent.getPos() << '\n';
+        Action action{getTime(), Action::ACCESS, accEvent.getPos(), 0};
+        script_.push_back(action);
+        //log_ << getTime() << ",access," << accEvent.getPos() << '\n';
     }
 
     long long getTime() {
@@ -54,7 +57,8 @@ public:
     void checkWriting() {
         for (size_t i = 0; i < copy_.size(); ++i) {
             if (copy_[i] != original_[i]) {
-                log_ << getTime() << ",write," << i << "," << original_[i] << '\n';
+                Action action{getTime(), Action::WRITE, i, original_[i]};
+                //log_ << getTime() << ",write," << i << "," << original_[i] << '\n';
                 copy_[i] = original_[i];
             }
         }
@@ -63,11 +67,16 @@ public:
     void finalize() {
         checkWriting();
         isActive = false;
+
+        for (auto& action: script_) {
+            log_ << action.toString() << "\n";
+        }
     }
 
 private:
     bool isActive = true;
     std::ostream& log_;
+    Script script_;
 
     Container copy_;
     const Container& original_;

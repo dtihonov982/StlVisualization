@@ -21,7 +21,6 @@ std::string Action::toString() const {
         default:
             throw Exception("Bad Action::Type.");
     }
-    oss << "\n";
     return oss.str();
 }
 

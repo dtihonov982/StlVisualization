@@ -19,6 +19,7 @@ struct Action {
 };
 
 using Script = std::vector<Action>;
+using Actions = std::vector<Action>;
 
 std::vector<std::string> split(std::string_view input, char delim);
 
