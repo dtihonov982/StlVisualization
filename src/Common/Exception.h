@@ -6,10 +6,6 @@
 
 class Exception: public std::exception {
 public:
-    Exception(std::string_view message)
-    : message_(message) {
-    }
-
     template<typename... Args>
     Exception(Args&&... args) {
         std::ostringstream oss;
