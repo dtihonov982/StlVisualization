@@ -12,16 +12,16 @@
 #include "NotifyingIterator.h"
 #include "Common.h"
 #include "Exception.h"
+#include "Case.h"
+#include "NullLogger.h"
+#include "MyAlgorithm.h"
 
-class NullLogger: public IEventHandler {
-public:
-    void handle(Event& e) override {}
-};
-
-using OriginalIterator = std::vector<int>::iterator;
-using NIter = NotifyingIterator<OriginalIterator>;
-
-
+std::string getPath(std::string_view algoName) {
+    std::string path{"logs/"};
+    path += algoName;
+    path += ".txt";
+    return path;
+}
 
 //return two NotifyingIterators to begin and end of the data
 std::pair<NIter, NIter>
@@ -40,48 +40,6 @@ getNI(std::vector<int>& data, IEventHandler& handler, size_t middlePos) {
     auto [begin, end] = getNI(data, handler);
     return {begin, middle, end};
 }
-
-std::string getPath(std::string_view algoName) {
-    std::string path{"logs/"};
-    path += algoName;
-    path += ".txt";
-    return path;
-}
-
-class Case {
-public:
-    using Container = std::vector<int>;
-    Case(const Container& data, 
-         std::string_view name, 
-         const AccessLogger<Container>::time_point& startPoint = std::chrono::high_resolution_clock::now())
-    : data_(data)
-    , name_(name)
-    , info_(name)
-    , file_(getPath(name))
-    , logger_(data_, file_, startPoint) {
-        if (!file_)
-            throw Exception("Can't open file ", getPath(name));
-        file_ << info_ << "\n";
-        file_ << data_ << "\n";
-    }
-
-    //return two NotifyingIterators to begin and end of the data
-    std::pair<NIter, NIter> getIterators() {
-        auto begin = NotifyingIterator(data_.begin(), data_.begin(), logger_);
-        auto end = NotifyingIterator(data_.begin(), data_.end(), logger_);
-        return {begin, end};
-    }
-
-    void finalize() {
-        logger_.finalize();
-    }
-private:
-    Container data_;
-    std::string_view name_;
-    std::string_view info_;
-    std::ofstream file_;
-    AccessLogger<Container> logger_;
-};
 
 TEST(std_algorithm, sort) {
     std::vector<int> data = getRandVector(50, 1, 1000);
@@ -616,25 +574,6 @@ TEST(std_algorithm, set) {
     }
     
 }
-
-namespace my {
-template<typename It>
-It copy(It begin_src, It end_src, It begin_dst) {
-    for (; begin_src < end_src; ++begin_src) {
-        *begin_dst = *begin_src;
-        ++begin_dst;
-    }
-    return begin_dst;
-}
-
-template<typename It>
-void double_each(It first, It last) {
-    for (; first < last; ++first) {
-        *first *= 2; 
-    }
-}
-
-} //my
 
 TEST(my_algorithm, copy) {
     std::vector<int> src(3, 101);

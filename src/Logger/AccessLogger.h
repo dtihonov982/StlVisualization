@@ -64,6 +64,10 @@ public:
         }
     }
 
+    const Script& getScript() const {
+        return script_;
+    }
+
     void finalize() {
         checkWriting();
         isActive = false;
