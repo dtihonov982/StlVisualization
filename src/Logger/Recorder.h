@@ -1,5 +1,5 @@
-#ifndef CASE_H
-#define CASE_H
+#ifndef RECORDER_H
+#define RECORDER_H
 
 #include <vector>
 #include <chrono>
@@ -13,10 +13,10 @@
 using OriginalIterator = std::vector<int>::iterator;
 using NIter = NotifyingIterator<OriginalIterator>;
 
-class Case {
+class Recorder {
 public:
     using Container = std::vector<int>;
-    Case(const Container& data, 
+    Recorder(const Container& data, 
          std::string_view name, 
          const EventInterpreter<Container>::time_point& startPoint = std::chrono::high_resolution_clock::now())
     : data_(data)
@@ -58,4 +58,4 @@ private:
     EventInterpreter<Container> interpreter_;
 };
 
-#endif //CASE_H
+#endif //RECORDER_H
