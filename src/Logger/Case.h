@@ -8,7 +8,7 @@
 #include <utility>
 
 #include "Exception.h"
-#include "AccessLogger.h"
+#include "EventInterpreter.h"
 
 using OriginalIterator = std::vector<int>::iterator;
 using NIter = NotifyingIterator<OriginalIterator>;
@@ -18,12 +18,12 @@ public:
     using Container = std::vector<int>;
     Case(const Container& data, 
          std::string_view name, 
-         const AccessLogger<Container>::time_point& startPoint = std::chrono::high_resolution_clock::now())
+         const EventInterpreter<Container>::time_point& startPoint = std::chrono::high_resolution_clock::now())
     : data_(data)
     , name_(name)
     , info_(name)
     , file_(getPath(name))
-    , logger_(data_, file_, startPoint) {
+    , interpreter_(data_, startPoint) {
         if (!file_)
             throw Exception("Can't open file ", getPath(name));
         file_ << info_ << "\n";
@@ -32,13 +32,15 @@ public:
 
     //return two NotifyingIterators to begin and end of the data
     std::pair<NIter, NIter> getIterators() {
-        auto begin = NotifyingIterator(data_.begin(), data_.begin(), logger_);
-        auto end = NotifyingIterator(data_.begin(), data_.end(), logger_);
+        auto begin = NotifyingIterator(data_.begin(), data_.begin(), interpreter_);
+        auto end = NotifyingIterator(data_.begin(), data_.end(), interpreter_);
         return {begin, end};
     }
 
     void finalize() {
-        logger_.finalize();
+        for (const auto& action: interpreter_.getScript()) {
+            file_ << action.toString() << "\n";
+        }
     }
 
     static std::string getPath(std::string_view algoName) {
@@ -53,7 +55,7 @@ private:
     std::string_view name_;
     std::string_view info_;
     std::ofstream file_;
-    AccessLogger<Container> logger_;
+    EventInterpreter<Container> interpreter_;
 };
 
 #endif //CASE_H
