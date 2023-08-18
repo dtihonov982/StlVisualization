@@ -2,24 +2,23 @@
 #define STOPWATCH_H
 
 #include <chrono>
+#include <cassert>
 
 class Stopwatch {
 public:
     using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
     Stopwatch() { start(); }
-    void start() { start_ = now(); }
-
-    size_t elapsedNanoseconds() const {
-        time_point curr = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration_cast<
-            std::chrono::nanoseconds
-            >(curr - start_).count();
-    }
-
+    void start();
+    void pause();
+    void resume();
+    static size_t getNanosecondsSince(const time_point& point);
+    size_t elapsedNanoseconds() const;
 private:
-    static time_point now() { return std::chrono::high_resolution_clock::now(); }
+    size_t idle_;
     time_point start_;
+    time_point pausePoint_;
+    bool isRunning_;
 };
 
 
