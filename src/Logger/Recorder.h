@@ -14,25 +14,26 @@
 using OriginalIterator = std::vector<int>::iterator;
 using NIter = NotifyingIterator<OriginalIterator>;
 
+//Create recording and save it in file
 class Recorder {
 public:
     using Container = std::vector<int>;
 
-    Recorder(const Container& data, 
-         std::string_view name, 
-         const std::shared_ptr<Stopwatch>& stopwatch_)
-    : data_(data)
-    , name_(name)
-    , info_(name)
-    , interpreter_(data_, stopwatch_) {
-    }
-
-    Recorder(const Container& data, 
-         std::string_view name)
+    Recorder(std::string_view name, const Container& data)
     : data_(data)
     , name_(name)
     , info_(name)
     , interpreter_(data_) {
+    }
+
+    //Many recorders may have one stopwatch for synchronized logging many data algorithms
+    Recorder(std::string_view name,
+             const Container& data, 
+             const std::shared_ptr<Stopwatch>& stopwatch_)
+    : data_(data)
+    , name_(name)
+    , info_(name)
+    , interpreter_(data_, stopwatch_) {
     }
 
     //return two NotifyingIterators to begin and end of the data

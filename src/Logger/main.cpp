@@ -604,7 +604,7 @@ TEST(my_algorithm, double_each) {
     std::vector<int> src(3, 101);
     try {
         //input data
-        Recorder recorder(src, "double_each");
+        Recorder recorder("double_each", src);
         auto [first, last] = recorder.getIterators();
 
         //algorithm
