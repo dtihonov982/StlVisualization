@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <memory>
+#include <algorithm>
 
 #include "Event.h"
 #include "Exception.h"
@@ -28,7 +29,6 @@ public:
             throw Exception("Start point must be in the past.");
     }
 
-    //TODO: default value
     EventInterpreter(const Container& original)
     : EventInterpreter(original, std::make_shared<Stopwatch>()) 
     {}
@@ -60,11 +60,33 @@ private:
         return stopwatch_->elapsedNanoseconds();
     }
 
+    //TODO: save in class member
+    bool getLastAccess(Action& dst) const {
+        auto it = std::find_if(script_.crbegin(), script_.crend(),
+            [] (const Action& action) {
+                return action.type == Action::ACCESS;
+            });
+        if (it != script_.crend()) {
+            dst = *it;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     void checkWriting() {
+        Action lastAccess;
+        size_t writingPoint;
+        if (getLastAccess(lastAccess)) {
+            writingPoint = lastAccess.timePoint;
+        }
+        else {
+            writingPoint = getTime();
+        }
         for (size_t i = 0; i < copy_.size(); ++i) {
             if (copy_[i] != original_[i]) {
-                Action action{getTime(), Action::WRITE, i, original_[i]};
+                Action action{writingPoint, Action::WRITE, i, original_[i]};
                 script_.push_back(action);
                 copy_[i] = original_[i];
             }
