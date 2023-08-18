@@ -4,10 +4,12 @@
 #include <vector>
 #include <iostream>
 #include <chrono>
+#include <memory>
 
 #include "Event.h"
 #include "Exception.h"
 #include "Script.h"
+#include "Stopwatch.h"
 
 //1. Get event
 //2. Register time of event
@@ -18,38 +20,44 @@ public:
 
     using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
-    EventInterpreter(const Container& original, const time_point& startPoint)
+    EventInterpreter(const Container& original, const std::shared_ptr<Stopwatch>& stopwatch)
     : copy_(original)
-    , original_(original) {
+    , original_(original) 
+    , stopwatch_(stopwatch) {
         if (getTime() < 0) 
             throw Exception("Start point must be in the past.");
     }
 
     //TODO: default value
     EventInterpreter(const Container& original)
-    : EventInterpreter(original, std::chrono::high_resolution_clock::now()) 
+    : EventInterpreter(original, std::make_shared<Stopwatch>()) 
     {}
 
     void handle(Event& event) override {
         if (event.getType() != Event::Access)
             return;
 
+        stopwatch_->pause();
+
         checkWriting();
 
         Access& accEvent = static_cast<Access&>(event);
         Action action{getTime(), Action::ACCESS, accEvent.getPos(), 0};
         script_.push_back(action);
+
+        stopwatch_->resume();
     }
 
     const Script& getScript() {
+        stopwatch_->pause();
         checkWriting();
+        stopwatch_->resume();
         return script_;
     }
 
 private:
-    long long getTime() {
-        auto currPoint_ = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration_cast<std::chrono::nanoseconds>(currPoint_ - startPoint_).count();
+    size_t getTime() {
+        return stopwatch_->elapsedNanoseconds();
     }
 
 
@@ -68,7 +76,7 @@ private:
 
     Container copy_;
     const Container& original_;
-    //Stopwatch stopwatch_;
+    std::shared_ptr<Stopwatch> stopwatch_;
 };
 
 #endif //EVENTINTERPRETER_H

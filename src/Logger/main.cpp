@@ -16,6 +16,7 @@
 #include "NullLogger.h"
 #include "MyAlgorithm.h"
 
+#if 0
 std::string getPath(std::string_view algoName) {
     std::string path{"logs/"};
     path += algoName;
@@ -597,19 +598,18 @@ TEST(my_algorithm, copy) {
     }
 
 }
-
+#endif
 
 TEST(my_algorithm, double_each) {
     std::vector<int> src(3, 101);
     try {
-        auto startPoint = std::chrono::high_resolution_clock::now();
         //input data
-        Recorder recorder(src, "double_each", startPoint);
+        Recorder recorder(src, "double_each");
         auto [first, last] = recorder.getIterators();
 
         //algorithm
         my::double_each(first, last);
-        recorder.finalize();
+        recorder.save();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();

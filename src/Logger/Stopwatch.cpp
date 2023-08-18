@@ -33,7 +33,7 @@ size_t Stopwatch::elapsedNanoseconds() const {
         return getNanosecondsSince(start_) - idle_;
     }
     else {
-        auto count = duration_cast<nanoseconds>(pausePoint_ - start_).count();
+        auto count = duration_cast<nanoseconds>(pausePoint_ - start_).count() - idle_;
         assert(count >= 0);
         return static_cast<size_t>(count);
     }
