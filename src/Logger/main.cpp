@@ -58,23 +58,6 @@ TEST(std_algorithm, sort) {
     }
 }
 
-TEST(std_algorithm, small_sort) {
-    std::vector<int> data(10);
-    std::iota(data.rbegin(), data.rend(), 0);
-
-    std::ofstream file{getPath("small_sort")};
-    file << "small sort\n" << data << '\n';
-
-    AccessLogger logger{data, file};
-
-    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
-    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
-
-    std::sort(begin_, end_);
-
-    logger.finalize();
-}
-
 TEST(std_algorithm, nth_element) {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
@@ -599,6 +582,25 @@ TEST(my_algorithm, copy) {
 
 }
 #endif
+
+TEST(std_algorithm, small_sort) {
+    std::vector<int> data(10);
+    std::iota(data.rbegin(), data.rend(), 0);
+
+    try {
+        //input data
+        Recorder recorder("small_sort", data);
+        auto [first, last] = recorder.getIterators();
+
+        //algorithm
+        std::sort(first, last);
+        recorder.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+
+}
 
 TEST(my_algorithm, double_each) {
     std::vector<int> src(3, 101);
