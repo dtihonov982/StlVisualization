@@ -73,8 +73,8 @@ public:
 private:
     std::shared_ptr<Container> data_;
     const Container dataOriginal_;
-    std::string_view name_;
-    std::string_view info_;
+    std::string name_;
+    std::string info_;
     EventInterpreter<Container> interpreter_;
 };
 
