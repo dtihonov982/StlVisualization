@@ -8,13 +8,13 @@
 #include <fstream>
 #include <random>
 
-#include "AccessLogger.h"
-#include "NotifyingIterator.h"
-#include "Common.h"
-#include "Exception.h"
-#include "Recorder.h"
-#include "NullLogger.h"
-#include "MyAlgorithm.h"
+#include "Common/Common.h"
+#include "Common/Exception.h"
+#include "Logger/AccessLogger.h"
+#include "Logger/NotifyingIterator.h"
+#include "Logger/Recorder.h"
+#include "Logger/NullLogger.h"
+#include "Logger/MyAlgorithm.h"
 
 #if 0
 std::string getPath(std::string_view algoName) {

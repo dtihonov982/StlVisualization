@@ -1,6 +1,6 @@
-#include "Player.h"
 #include <fstream>
-#include "Exception.h"
+#include "Common/Exception.h"
+#include "Visual/Player.h"
 
 
 Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {

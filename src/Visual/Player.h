@@ -3,9 +3,10 @@
 
 #include <SDL2/SDL.h>
 #include <string>
-#include "Chart.h"
-#include "Script.h"
 #include <stack>
+
+#include "Visual/Chart.h"
+#include "Common/Script.h"
 
 class Player {
 public:

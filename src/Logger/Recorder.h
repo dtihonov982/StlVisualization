@@ -8,8 +8,8 @@
 #include <utility>
 #include <memory>
 
-#include "Exception.h"
-#include "EventInterpreter.h"
+#include "Common/Exception.h"
+#include "Logger/EventInterpreter.h"
 
 using OriginalIterator = std::vector<int>::iterator;
 using NIter = NotifyingIterator<OriginalIterator>;

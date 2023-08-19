@@ -5,9 +5,9 @@
 #include <iostream>
 #include <chrono>
 
-#include "Event.h"
-#include "Exception.h"
-#include "Script.h"
+#include "Logger/Event.h"
+#include "Common/Exception.h"
+#include "Common/Script.h"
 
 //AccessLogger logs changes in Container by using information aboud access to it.
 //After each access AccessLogger compares it's own version of Container and

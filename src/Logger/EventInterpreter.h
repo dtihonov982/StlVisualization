@@ -7,10 +7,10 @@
 #include <memory>
 #include <algorithm>
 
-#include "Event.h"
-#include "Exception.h"
-#include "Script.h"
-#include "Stopwatch.h"
+#include "Logger/Event.h"
+#include "Common/Exception.h"
+#include "Common/Script.h"
+#include "Logger/Stopwatch.h"
 
 //1. Get event
 //2. Register time of event

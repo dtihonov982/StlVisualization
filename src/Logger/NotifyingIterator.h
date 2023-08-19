@@ -5,7 +5,7 @@
 #include <string>
 #include <cassert>
 
-#include "Event.h"
+#include "Logger/Event.h"
 
 //Iterator what sends differend information about what is going on to IEventHandler
 template <typename OriginalIterator>

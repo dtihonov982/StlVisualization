@@ -1,7 +1,7 @@
 #ifndef NULLLOGGER_H
 #define NULLLOGGER_H
 
-#include <Event.h>
+#include <Logger/Event.h>
 
 class NullLogger: public IEventHandler {
 public:

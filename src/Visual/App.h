@@ -4,11 +4,12 @@
 #include <SDL2/SDL.h>
 #include <string_view>
 #include <string>
-#include "Chart.h"
-#include "Script.h"
 #include <stack>
-#include "Player.h"
-#include "Exception.h"
+
+#include "Visual/Player.h"
+#include "Common/Exception.h"
+#include "Visual/Chart.h"
+#include "Common/Script.h"
 
 class App {
 public:

@@ -1,0 +1,4 @@
+cmake_minimum_required(VERSION 3.25)
+project(StlVisualization)
+add_subdirectory(programs)
+add_subdirectory(src)
