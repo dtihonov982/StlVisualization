@@ -21,6 +21,12 @@ void double_each(It first, It last) {
     }
 }
 
+template<typename It>
+void copy_first(It begin_src, It end_src, It begin_dst) {
+    auto tmp = *begin_src;
+    *begin_dst = tmp;
+}
+
 } //my
 
 

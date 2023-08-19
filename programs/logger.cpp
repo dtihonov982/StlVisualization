@@ -15,6 +15,7 @@
 #include "Logger/Recorder.h"
 #include "Logger/NullLogger.h"
 #include "Logger/MyAlgorithm.h"
+#include "Logger/RecordingSet.h"
 
 #if 0
 std::string getPath(std::string_view algoName) {
@@ -612,6 +613,44 @@ TEST(my_algorithm, double_each) {
         //algorithm
         my::double_each(first, last);
         recorder.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(std_algorithm, scan) {
+    std::vector<int> src = getRandVector(10, 1, 25);
+    std::vector<int> dst(10);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("inclusive_scan_src", src);
+        auto [f2, l2] = set.add("inclusive_scan_dst", dst);
+
+        set.startStopwatch();
+        std::inclusive_scan(f1, l1, f2);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(my_algorithm, copy_first) {
+    std::vector<int> src {101, 202, 303};
+    std::vector<int> dst(3, 0);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("copy_first_src", src);
+        auto [f2, l2] = set.add("copy_first_dst", dst);
+
+        set.startStopwatch();
+        std::inclusive_scan(f1, l1, f2);
+
+        set.save();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
