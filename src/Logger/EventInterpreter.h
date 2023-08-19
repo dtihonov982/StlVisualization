@@ -21,15 +21,16 @@ public:
 
     using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
-    EventInterpreter(const Container& original, const std::shared_ptr<Stopwatch>& stopwatch)
-    : copy_(original)
+    EventInterpreter(const std::shared_ptr<Container>& original, const std::shared_ptr<Stopwatch>& stopwatch)
+    : copy_(*original) //TODO: nullptr
     , original_(original) 
     , stopwatch_(stopwatch) {
         if (getTime() < 0) 
             throw Exception("Start point must be in the past.");
     }
 
-    EventInterpreter(const Container& original)
+    //TODO: default argument
+    EventInterpreter(const std::shared_ptr<Container>& original)
     : EventInterpreter(original, std::make_shared<Stopwatch>()) 
     {}
 
@@ -85,10 +86,11 @@ private:
             writingPoint = getTime();
         }
         for (size_t i = 0; i < copy_.size(); ++i) {
-            if (copy_[i] != original_[i]) {
-                Action action{writingPoint, Action::WRITE, i, original_[i]};
+            auto mutableContainerValue = (*original_)[i];
+            if (copy_[i] != mutableContainerValue) {
+                Action action{writingPoint, Action::WRITE, i, mutableContainerValue};
                 script_.push_back(action);
-                copy_[i] = original_[i];
+                copy_[i] = mutableContainerValue;
             }
         }
     }
@@ -97,7 +99,7 @@ private:
     const time_point startPoint_;
 
     Container copy_;
-    const Container& original_;
+    std::shared_ptr<Container> original_;
     std::shared_ptr<Stopwatch> stopwatch_;
 };
 

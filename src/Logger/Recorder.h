@@ -22,8 +22,8 @@ class Recorder {
 public:
     using Container = std::vector<int>;
 
-    Recorder(std::string_view name, const Container& data)
-    : data_(data)
+    Recorder(const std::string& name, const Container& data)
+    : data_(std::make_shared<Container>(data))
     , dataOriginal_(data)
     , name_(name)
     , info_(name)
@@ -34,7 +34,7 @@ public:
     Recorder(std::string_view name,
              const Container& data, 
              const std::shared_ptr<Stopwatch>& stopwatch_)
-    : data_(data)
+    : data_(std::make_shared<Container>(data))
     , dataOriginal_(data)
     , name_(name)
     , info_(name)
@@ -43,8 +43,8 @@ public:
 
     //return two NotifyingIterators to begin and end of the data
     std::pair<NIter, NIter> getIterators() {
-        auto begin = NotifyingIterator(data_.begin(), data_.begin(), interpreter_);
-        auto end = NotifyingIterator(data_.begin(), data_.end(), interpreter_);
+        auto begin = NotifyingIterator(data_->begin(), data_->begin(), interpreter_);
+        auto end = NotifyingIterator(data_->begin(), data_->end(), interpreter_);
         return {begin, end};
     }
 
@@ -71,7 +71,7 @@ public:
     }
 
 private:
-    Container data_;
+    std::shared_ptr<Container> data_;
     const Container dataOriginal_;
     std::string_view name_;
     std::string_view info_;
