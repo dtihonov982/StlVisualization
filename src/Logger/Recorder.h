@@ -7,12 +7,15 @@
 #include <fstream>
 #include <utility>
 #include <memory>
+#include <filesystem>
 
 #include "Common/Exception.h"
 #include "Logger/EventInterpreter.h"
 
 using OriginalIterator = std::vector<int>::iterator;
 using NIter = NotifyingIterator<OriginalIterator>;
+
+namespace fs = std::filesystem;
 
 //Create recording and save it in file
 class Recorder {
@@ -44,9 +47,10 @@ public:
     }
 
     void save() {
-        std::ofstream file(getPath(name_));
+        auto path = getPathForSaving(name_);
+        std::ofstream file(path);
         if (!file)
-            throw Exception("Can't open file ", getPath(name_));
+            throw Exception("Can't open file ", path);
         file << info_ << "\n";
         file << data_ << "\n";
         for (const auto& action: interpreter_.getScript()) {
@@ -54,11 +58,14 @@ public:
         }
     }
 
-    static std::string getPath(std::string_view algoName) {
-        std::string path{"logs/"};
-        path += algoName;
-        path += ".txt";
-        return path;
+    static std::string getPathForSaving(std::string_view algoName) {
+        fs::path logs{"logs"};
+        fs::create_directory(logs);
+        fs::path filename{algoName.data()};
+        filename = logs / filename;
+        fs::path extension{".txt"};
+        filename += extension;
+        return filename;
     }
 
 private:
