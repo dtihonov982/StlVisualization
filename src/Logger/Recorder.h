@@ -24,6 +24,7 @@ public:
 
     Recorder(std::string_view name, const Container& data)
     : data_(data)
+    , dataOriginal_(data)
     , name_(name)
     , info_(name)
     , interpreter_(data_) {
@@ -34,6 +35,7 @@ public:
              const Container& data, 
              const std::shared_ptr<Stopwatch>& stopwatch_)
     : data_(data)
+    , dataOriginal_(data)
     , name_(name)
     , info_(name)
     , interpreter_(data_, stopwatch_) {
@@ -52,7 +54,7 @@ public:
         if (!file)
             throw Exception("Can't open file ", path);
         file << info_ << "\n";
-        file << data_ << "\n";
+        file << dataOriginal_ << "\n";
         for (const auto& action: interpreter_.getScript()) {
             file << action.toString() << "\n";
         }
@@ -70,6 +72,7 @@ public:
 
 private:
     Container data_;
+    const Container dataOriginal_;
     std::string_view name_;
     std::string_view info_;
     EventInterpreter<Container> interpreter_;

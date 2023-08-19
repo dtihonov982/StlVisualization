@@ -585,7 +585,7 @@ TEST(my_algorithm, copy) {
 
 TEST(std_algorithm, small_sort) {
     std::vector<int> data(10);
-    std::iota(data.rbegin(), data.rend(), 0);
+    std::iota(data.rbegin(), data.rend(), 1);
 
     try {
         //input data
