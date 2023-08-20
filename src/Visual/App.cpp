@@ -54,6 +54,22 @@ App::App(const std::vector<std::string_view>& files) {
     isRunning_ = true;
 }
 
+
+void App::run(int frameDelay) {
+    while (isRunning()) {
+        int frameStart = SDL_GetTicks();
+
+        handleEvents();
+        update();
+        render();
+
+        int frameTime = SDL_GetTicks() - frameStart;
+
+        if (frameTime < frameDelay)
+            SDL_Delay(frameDelay - frameTime);
+    }
+}
+
 void App::update() {
     for (auto& player: players_)
         player.update();

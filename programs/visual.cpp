@@ -24,18 +24,7 @@ int main(int argc, char** argv) {
 
     try {
         App app(filenames);
-        while (app.isRunning()) {
-            int frameStart = SDL_GetTicks();
-
-            app.handleEvents();
-            app.update();
-            app.render();
-
-            int frameTime = SDL_GetTicks() - frameStart;
-
-            if (frameTime < frameDelay)
-                SDL_Delay(frameDelay - frameTime);
-        }
+        app.run(frameDelay);
     }
     catch (const Exception& ex) {
         std::cerr << ex.what() << "\n";

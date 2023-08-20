@@ -15,9 +15,10 @@ class App {
 public:
     App(const std::vector<std::string_view>& files);
     ~App();
+    void run(int frameDelay);
+    void handleEvents();
     void update();
     void render();
-    void handleEvents();
     void handleKeyDown(SDL_Event& event);
     bool isRunning() { return isRunning_; }
     static std::vector<SDL_Rect>
