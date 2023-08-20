@@ -22,11 +22,13 @@ public:
     using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
     EventInterpreter(const std::shared_ptr<Container>& original, const std::shared_ptr<Stopwatch>& stopwatch)
-    : copy_(*original) //TODO: nullptr
-    , original_(original) 
+    : original_(original) 
     , stopwatch_(stopwatch) {
         if (getTime() < 0) 
             throw Exception("Start point must be in the past.");
+        if (!original)
+            throw Exception("Pointer to original must be initialized.");
+        copy_ = *original;
     }
 
     //TODO: default argument

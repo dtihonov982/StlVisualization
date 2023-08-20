@@ -657,6 +657,125 @@ TEST(my_algorithm, copy_first) {
     }
 }
 
+TEST(std_algorithm, set) {
+    std::vector<int> A = getRandVector(20, 100, 199);
+    std::sort(A.begin(), A.end());
+
+    std::vector<int> C = getRandVector(10, 200, 299);
+    std::sort(C.begin(), C.end());
+
+    A.insert(A.end(), C.begin(), C.end()); //A += C
+    ASSERT_TRUE(std::is_sorted(A.begin(), A.end()));
+
+    std::vector<int> B = getRandVector(20, 300, 499);
+    std::sort(B.begin(), B.end());
+
+    B.insert(B.begin(), C.begin(), C.end()); //B += C
+    ASSERT_TRUE(std::is_sorted(B.begin(), B.end()));
+
+    std::vector<int> R(60);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("includes_A", A);
+        auto [f2, l2] = set.add("includes_C", C);
+        bool result = std::includes(f1, l1, f2, l2);
+        ASSERT_TRUE(result);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    
+#if 0
+    try {
+        //input data
+        Recorder ARecorder(A, "set_differrence_A");
+        auto [beginA, endA] = ARecorder.getIterators();
+
+        Recorder BRecorder(B, "set_differrence_B");
+        auto [beginB, endB] = BRecorder.getIterators();
+
+        Recorder RRecorder(R, "set_differrence_R");
+        auto [beginR, endR] = RRecorder.getIterators();
+
+        //algorithm
+        std::set_difference(beginA, endA, beginB, endB, beginR);
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    
+    try {
+        //input data
+        Recorder ARecorder(A, "set_intersection_A");
+        auto [beginA, endA] = ARecorder.getIterators();
+
+        Recorder BRecorder(B, "set_intersection_B");
+        auto [beginB, endB] = BRecorder.getIterators();
+
+        Recorder RRecorder(R, "set_intersection_R");
+        auto [beginR, endR] = RRecorder.getIterators();
+
+        //algorithm
+        std::set_intersection(beginA, endA, beginB, endB, beginR);
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    
+    try {
+        //input data
+        Recorder ARecorder(A, "set_symmetric_difference_A");
+        auto [beginA, endA] = ARecorder.getIterators();
+
+        Recorder BRecorder(B, "set_symmetric_difference_B");
+        auto [beginB, endB] = BRecorder.getIterators();
+
+        Recorder RRecorder(R, "set_symmetric_difference_R");
+        auto [beginR, endR] = RRecorder.getIterators();
+
+        //algorithm
+        std::set_symmetric_difference(beginA, endA, beginB, endB, beginR);
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    
+    try {
+        //input data
+        Recorder ARecorder(A, "set_union_A");
+        auto [beginA, endA] = ARecorder.getIterators();
+
+        Recorder BRecorder(B, "set_union_B");
+        auto [beginB, endB] = BRecorder.getIterators();
+
+        Recorder RRecorder(R, "set_union_R");
+        auto [beginR, endR] = RRecorder.getIterators();
+
+        //algorithm
+        std::set_union(beginA, endA, beginB, endB, beginR);
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+#endif
+    
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
