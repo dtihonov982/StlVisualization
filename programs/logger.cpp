@@ -628,7 +628,7 @@ TEST(std_algorithm, scan) {
         auto [f1, l1] = set.add("inclusive_scan_src", src);
         auto [f2, l2] = set.add("inclusive_scan_dst", dst);
 
-        set.startStopwatch();
+        set.runStopwatch();
         std::inclusive_scan(f1, l1, f2);
 
         set.save();
@@ -647,7 +647,7 @@ TEST(my_algorithm, copy_first) {
         auto [f1, l1] = set.add("copy_first_src", src);
         auto [f2, l2] = set.add("copy_first_dst", dst);
 
-        set.startStopwatch();
+        set.runStopwatch();
         my::copy_first(f1, l1, f2);
 
         set.save();

@@ -6,22 +6,18 @@
 #include "Logger/Recorder.h"
 #include "Logger/Stopwatch.h"
 
+// RecordingSet organizes recording of algorithms that gets many data as input (std::merge etc.).
 class RecordingSet {
 public:
     using Container = std::vector<int>;
 
     std::pair<NIter, NIter> add(const std::string& name, const Container& data) {
         recorders_.emplace(name, Recorder {name, data, synchTime_});
-        auto it = recorders_.find(name);
-        if (it != recorders_.end()) {
-            return it->second.getIterators();
-        }
-        else {
-            throw Exception("Adding ", name, " in recording set error.");
-        }
+        return getIterators(name);
     }
 
-    void startStopwatch() {
+    // Call this method before an algorithm execution to minimize start delay in a record playing.
+    void runStopwatch() {
         synchTime_->start();
     }
 
