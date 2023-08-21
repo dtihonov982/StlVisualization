@@ -12,15 +12,16 @@
 #include "Common/Script.h"
 #include "Logger/Stopwatch.h"
 
-//1. Get event
-//2. Register time of event
-//3. Interpreter events to actions
+// EventInterpreter gets from NotifyingIterator an events and interpreters those events as an access and a changes of data.
 template<typename Container>
 class EventInterpreter: public IEventHandler {
 public:
 
     using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
+    // Class uses shared_ptr to stopwatch, because for one algorithm may be many EventInterpreter for each data
+    // As example, the algorithm std::copy(f1, l1, f2) gets two diapasons: [f1, l1) and [f2, l2).
+    // For each of this diapasons may be it's own EventIterpreter. But their stopwatches will be synchronized.
     EventInterpreter(const std::shared_ptr<Container>& original, const std::shared_ptr<Stopwatch>& stopwatch)
     : original_(original) 
     , stopwatch_(stopwatch) {
@@ -31,15 +32,21 @@ public:
         copy_ = *original;
     }
 
-    //TODO: default argument
+    // TODO: default argument
+    // For single diapason algorithm (std::sort) there is no need to synchronize stopwatch
     EventInterpreter(const std::shared_ptr<Container>& original)
     : EventInterpreter(original, std::make_shared<Stopwatch>()) 
     {}
 
+    // A NotifyingIterator can notify only about access. The goal is to get information about writing.
+    // Also it is important to get information about when was writing. The main idea behind EventInterpreter is that
+    // writing can be only between two access from NotifyingIterator to the data. So if we will check if the data was
+    // changed between two access from NotifyingIterator we find an approximately moment of writing.
     void handle(Event& event) override {
         if (event.getType() != Event::Access)
             return;
 
+        // The time of interpretation of events must not interact to information about writing and access time.
         stopwatch_->pause();
 
         checkWriting();
@@ -63,7 +70,7 @@ private:
         return stopwatch_->elapsedNanoseconds();
     }
 
-    //TODO: save in class member
+    // TODO: save in class member
     bool getLastAccess(Action& dst) const {
         auto it = std::find_if(script_.crbegin(), script_.crend(),
             [] (const Action& action) {
