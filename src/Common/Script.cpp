@@ -83,28 +83,8 @@ size_t tryToReadSizeT(std::string_view str) {
 std::vector<Action> readScript(std::istream& is, char delim) {
     std::vector<Action> script;
     for (std::string line; std::getline(is, line);) {
-        auto entry = split(line, delim);
-        int rawPos; 
-        try {
-            rawPos = std::stoi(entry[2]);
-        }
-        catch (const std::invalid_argument& ex) {
-            throw Exception("Error conversion to int: ", entry[2]);
-        }
-        if (rawPos < 0) {
-            throw Exception("Negative position.");
-        }
-        size_t pos = static_cast<size_t>(rawPos);
-        if (entry[1] == "access") {
-            script.push_back({0, Action::ACCESS, pos, 0});
-        }
-        else if (entry[1] == "write") {
-            int value = std::stoi(entry[3]);
-            script.push_back({0, Action::WRITE, pos, value});
-        }
-        else {
-            throw Exception("Unknow token ", entry[1], " in line ", line);
-        }
+        Action curr = Action::loadFromString(line);
+        script.push_back(curr);
     }
     return script;
 }
