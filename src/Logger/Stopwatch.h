@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cassert>
 #include <cstdint>
+#include <mutex>
 
 class Stopwatch {
 public:
@@ -13,7 +14,9 @@ public:
     Stopwatch() { start(); }
     void start();
     void pause();
+    void lock() { pause(); }
     void resume();
+    void unlock() { resume(); }
     uint64_t elapsedNanoseconds() const;
 private:
     std::chrono::nanoseconds idle_;
@@ -21,6 +24,8 @@ private:
     time_point pausePoint_;
     bool isRunning_;
 };
+
+using pause_guard = std::lock_guard<Stopwatch>;
 
 
 #endif //STOPWATCH_H

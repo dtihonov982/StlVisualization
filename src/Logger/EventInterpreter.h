@@ -7,6 +7,7 @@
 #include <memory>
 #include <algorithm>
 #include <cstdint>
+#include <mutex>
 
 #include "Logger/Event.h"
 #include "Common/Exception.h"
@@ -46,7 +47,7 @@ public:
             return;
 
         // The time of interpretation of events must not interact to information about writing and access time.
-        stopwatch_->pause();
+        pause_guard pause(*stopwatch_);
 
         checkWriting();
 
@@ -54,13 +55,11 @@ public:
         Action action{stopwatch_->elapsedNanoseconds(), Action::ACCESS, accEvent.getPos(), 0};
         script_.push_back(action);
 
-        stopwatch_->resume();
     }
 
     const Script& getScript() {
-        stopwatch_->pause();
+        pause_guard pause(*stopwatch_);
         checkWriting();
-        stopwatch_->resume();
         return script_;
     }
 
