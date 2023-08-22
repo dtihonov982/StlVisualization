@@ -4,38 +4,8 @@
 
 
 Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {
-    std::ifstream file{filename.data()};
-    if (!file)
-        throw Exception("Can not open file: ", filename);
-
-    std::string title;
-    if(!std::getline(file, title))
-        throw Exception("Title reading error.");
-
-    std::string dump;
-    if(!std::getline(file, dump))
-        throw Exception("Data reading error.");
-
-
-    std::vector<int> data; 
-    try { 
-        data = loadDataFromDump(dump, ',');
-    }
-    catch (const Exception& ex) {
-        std::cerr << "Data parsing error.";
-        throw ex;
-    }
-
-    Script script;
-    try {
-        script = readScript(file, ',');
-    }
-    catch (const Exception& ex) {
-        std::cerr << "Can not create script from file " << filename << "\n";
-        throw ex;
-    }
-
-    return Player(rect, title, data, script);
+    Record record = Record::load(filename);
+    return Player(rect, record.info, record.data, record.script);
 }
 
 Player::Player(const SDL_Rect& geom, 

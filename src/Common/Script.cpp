@@ -2,6 +2,7 @@
 #include <cassert>
 #include <sstream>
 #include <string>
+#include <fstream>
 
 #include "Common/Exception.h"
 
@@ -97,3 +98,18 @@ std::vector<int> loadDataFromDump(const std::string& dump, char delim) {
     }
     return result;
 }
+
+Record Record::load(std::string_view filename) {
+    std::ifstream file{filename.data()};
+    if (!file)
+        throw Exception("Can't open file ", filename);
+    Record rec;
+    std::getline(file, rec.info);
+    std::string dump;
+    std::getline(file, dump);
+    rec.data = loadDataFromDump(dump, ',');
+    rec.script = readScript(file, ',');
+    return rec;
+}
+        
+

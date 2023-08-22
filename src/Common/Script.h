@@ -7,12 +7,6 @@
 #include <sstream>
 #include <cstdint>
 
-struct Record {
-    std::string info;
-    int speed = 100; // ms per frame / ns
-    std::vector<Action> script;
-};
-
 struct Action {
     enum Type { ACCESS, WRITE };
 
@@ -23,6 +17,16 @@ struct Action {
 
     std::string toString() const;
     static Action loadFromString(std::string_view str);
+};
+
+struct Record {
+    std::string name;
+    std::string info;
+    int speed = 100; // ms per frame / ns
+    std::vector<int> data;
+    std::vector<Action> script;
+
+    static Record load(std::string_view filename);
 };
 
 using Script = std::vector<Action>;
