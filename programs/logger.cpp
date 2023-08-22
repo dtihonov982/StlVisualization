@@ -590,12 +590,12 @@ TEST(std_algorithm, small_sort) {
 
     try {
         //input data
-        Recorder recorder("small_sort", data);
-        auto [first, last] = recorder.getIterators();
+        RecordingSet set;
+        auto [first, last] = set.add("small_sort", data);
 
         //algorithm
         std::sort(first, last);
-        recorder.save();
+        set.save();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -607,12 +607,12 @@ TEST(my_algorithm, double_each) {
     std::vector<int> src(3, 101);
     try {
         //input data
-        Recorder recorder("double_each", src);
-        auto [first, last] = recorder.getIterators();
+        RecordingSet set;
+        auto [first, last] = set.add("double_each", src);
 
         //algorithm
         my::double_each(first, last);
-        recorder.save();
+        set.save();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -628,7 +628,6 @@ TEST(std_algorithm, scan) {
         auto [f1, l1] = set.add("inclusive_scan_src", src);
         auto [f2, l2] = set.add("inclusive_scan_dst", dst);
 
-        set.runStopwatch();
         std::inclusive_scan(f1, l1, f2);
 
         set.save();
@@ -647,7 +646,6 @@ TEST(my_algorithm, copy_first) {
         auto [f1, l1] = set.add("copy_first_src", src);
         auto [f2, l2] = set.add("copy_first_dst", dst);
 
-        set.runStopwatch();
         my::copy_first(f1, l1, f2);
 
         set.save();
@@ -687,92 +685,6 @@ TEST(std_algorithm, set) {
     catch (const Exception& ex) {
         FAIL() << ex.what();
     }
-    
-#if 0
-    try {
-        //input data
-        Recorder ARecorder(A, "set_differrence_A");
-        auto [beginA, endA] = ARecorder.getIterators();
-
-        Recorder BRecorder(B, "set_differrence_B");
-        auto [beginB, endB] = BRecorder.getIterators();
-
-        Recorder RRecorder(R, "set_differrence_R");
-        auto [beginR, endR] = RRecorder.getIterators();
-
-        //algorithm
-        std::set_difference(beginA, endA, beginB, endB, beginR);
-        ARecorder.finalize();
-        BRecorder.finalize();
-        RRecorder.finalize();
-    }
-    catch (const Exception& ex) {
-        FAIL() << ex.what();
-    }
-    
-    try {
-        //input data
-        Recorder ARecorder(A, "set_intersection_A");
-        auto [beginA, endA] = ARecorder.getIterators();
-
-        Recorder BRecorder(B, "set_intersection_B");
-        auto [beginB, endB] = BRecorder.getIterators();
-
-        Recorder RRecorder(R, "set_intersection_R");
-        auto [beginR, endR] = RRecorder.getIterators();
-
-        //algorithm
-        std::set_intersection(beginA, endA, beginB, endB, beginR);
-        ARecorder.finalize();
-        BRecorder.finalize();
-        RRecorder.finalize();
-    }
-    catch (const Exception& ex) {
-        FAIL() << ex.what();
-    }
-    
-    try {
-        //input data
-        Recorder ARecorder(A, "set_symmetric_difference_A");
-        auto [beginA, endA] = ARecorder.getIterators();
-
-        Recorder BRecorder(B, "set_symmetric_difference_B");
-        auto [beginB, endB] = BRecorder.getIterators();
-
-        Recorder RRecorder(R, "set_symmetric_difference_R");
-        auto [beginR, endR] = RRecorder.getIterators();
-
-        //algorithm
-        std::set_symmetric_difference(beginA, endA, beginB, endB, beginR);
-        ARecorder.finalize();
-        BRecorder.finalize();
-        RRecorder.finalize();
-    }
-    catch (const Exception& ex) {
-        FAIL() << ex.what();
-    }
-    
-    try {
-        //input data
-        Recorder ARecorder(A, "set_union_A");
-        auto [beginA, endA] = ARecorder.getIterators();
-
-        Recorder BRecorder(B, "set_union_B");
-        auto [beginB, endB] = BRecorder.getIterators();
-
-        Recorder RRecorder(R, "set_union_R");
-        auto [beginR, endR] = RRecorder.getIterators();
-
-        //algorithm
-        std::set_union(beginA, endA, beginB, endB, beginR);
-        ARecorder.finalize();
-        BRecorder.finalize();
-        RRecorder.finalize();
-    }
-    catch (const Exception& ex) {
-        FAIL() << ex.what();
-    }
-#endif
     
 }
 

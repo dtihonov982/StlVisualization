@@ -94,6 +94,7 @@ private:
         else {
             writingPoint = getTime();
         }
+        //TODO:delete last access if positions of writing and access are the same.
         for (size_t i = 0; i < copy_.size(); ++i) {
             auto mutableContainerValue = (*original_)[i];
             if (copy_[i] != mutableContainerValue) {
