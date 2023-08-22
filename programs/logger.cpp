@@ -611,6 +611,7 @@ TEST(my_algorithm, double_each) {
         auto [first, last] = set.add("double_each", src);
 
         //algorithm
+        set.runStopwatch();
         my::double_each(first, last);
         set.save();
     }

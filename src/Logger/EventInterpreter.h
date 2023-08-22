@@ -6,6 +6,7 @@
 #include <chrono>
 #include <memory>
 #include <algorithm>
+#include <cstdint>
 
 #include "Logger/Event.h"
 #include "Common/Exception.h"
@@ -25,8 +26,6 @@ public:
     EventInterpreter(const std::shared_ptr<Container>& original, const std::shared_ptr<Stopwatch>& stopwatch)
     : original_(original) 
     , stopwatch_(stopwatch) {
-        if (getTime() < 0) 
-            throw Exception("Start point must be in the past.");
         if (!original)
             throw Exception("Pointer to original must be initialized.");
         copy_ = *original;
@@ -52,7 +51,7 @@ public:
         checkWriting();
 
         Access& accEvent = static_cast<Access&>(event);
-        Action action{getTime(), Action::ACCESS, accEvent.getPos(), 0};
+        Action action{stopwatch_->elapsedNanoseconds(), Action::ACCESS, accEvent.getPos(), 0};
         script_.push_back(action);
 
         stopwatch_->resume();
@@ -66,10 +65,6 @@ public:
     }
 
 private:
-    size_t getTime() {
-        return stopwatch_->elapsedNanoseconds();
-    }
-
     // TODO: save in class member
     bool getLastAccess(Action& dst) const {
         auto it = std::find_if(script_.crbegin(), script_.crend(),
@@ -87,12 +82,12 @@ private:
 
     void checkWriting() {
         Action lastAccess;
-        size_t writingPoint;
+        uint64_t writingPoint;
         if (getLastAccess(lastAccess)) {
             writingPoint = lastAccess.timePoint;
         }
         else {
-            writingPoint = getTime();
+            writingPoint = stopwatch_->elapsedNanoseconds();
         }
         //TODO:delete last access if positions of writing and access are the same.
         for (size_t i = 0; i < copy_.size(); ++i) {

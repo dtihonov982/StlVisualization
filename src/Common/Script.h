@@ -5,11 +5,18 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstdint>
+
+struct Record {
+    std::string info;
+    int speed = 100; // ms per frame / ns
+    std::vector<Action> script;
+};
 
 struct Action {
     enum Type { ACCESS, WRITE };
 
-    size_t timePoint;
+    uint64_t timePoint;
     Type type;
     size_t pos;
     int value;
