@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "DebugLogger.h"
+#include "Logger/DebugLogger.h"
 
 void DebugLogger::handle(Event& event) {
     switch (event.getType()) {

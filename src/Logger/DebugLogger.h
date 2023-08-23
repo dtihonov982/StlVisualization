@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <string>
 
-#include "Event.h"
+#include "Logger/Event.h"
 
 //DebugLogger collects information about which method of 
 //iterator was called.

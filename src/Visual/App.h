@@ -4,19 +4,26 @@
 #include <SDL2/SDL.h>
 #include <string_view>
 #include <string>
-#include "Chart.h"
-#include "Script.h"
 #include <stack>
-#include "Player.h"
-#include "Exception.h"
+#include <cstdint>
 
-class App {
+#include "Visual/Player.h"
+#include "Common/Exception.h"
+#include "Visual/Chart.h"
+#include "Visual/Scheduler.h"
+#include "Common/Script.h"
+#include "Logger/Event.h"
+
+using PlayerScheduler = Scheduler<size_t>;
+
+class App: public IEventHandler {
 public:
-    App(const std::vector<std::string_view>& files);
+    App(uint64_t delayRatio, const std::vector<std::string_view>& files);
     ~App();
+    void run();
+    void handleEvents();
     void update();
     void render();
-    void handleEvents();
     void handleKeyDown(SDL_Event& event);
     bool isRunning() { return isRunning_; }
     static std::vector<SDL_Rect>
@@ -24,7 +31,10 @@ public:
                   int width, 
                   int height, 
                   float gapRatio = 0.90f);
+    void initScheduler();
+    void handle(Event& event) override;
 private:
+    Scheduler<IEventHandlerPtr> sched_;
     std::vector<Player> players_;
     SDL_Window* window_;
     SDL_Renderer* renderer_;

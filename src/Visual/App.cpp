@@ -1,6 +1,8 @@
 #include "App.h"
 #include <fstream>
 
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
 std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float gapRatio) {
     std::vector<SDL_Rect> blocks;
@@ -18,7 +20,7 @@ std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float
     return blocks;
 }
 
-App::App(const std::vector<std::string_view>& files) {
+App::App(uint64_t delayRatio, const std::vector<std::string_view>& files) {
     
     int windowWidth = 1024;
     int windowHeight = 640;
@@ -27,7 +29,7 @@ App::App(const std::vector<std::string_view>& files) {
     std::vector<SDL_Rect> blocks = emplaceBlocks(count, windowWidth, windowHeight);
     for (size_t i = 0; i < count; ++i) {
         try {
-            Player curr = Player::makePlayer(blocks[i], files[i]);
+            Player curr = Player::makePlayer(blocks[i], delayRatio, files[i]);
             players_.push_back(std::move(curr));
         }
         catch (const Exception& ex) {
@@ -52,6 +54,24 @@ App::App(const std::vector<std::string_view>& files) {
         throw Exception("Renderer creating error.");
 
     isRunning_ = true;
+}
+
+
+void App::run() {
+    initScheduler();
+    while (isRunning()) {
+        IEventHandlerPtr handler = sched_.wait();
+        WakeUp event{&sched_};
+        handler->handle(event);
+        render();
+    }
+}
+
+void App::initScheduler() {
+    for (auto& player: players_)
+        sched_.add(milliseconds(player.getMsToNextAction()), &player);
+    // TODO: ups as class member
+    sched_.add(40ms, this);
 }
 
 void App::update() {
@@ -96,4 +116,13 @@ App::~App() {
     SDL_DestroyWindow(window_);
     SDL_DestroyRenderer(renderer_);
     SDL_Quit();
+}
+
+
+void App::handle(Event& event) {
+    if (event.getType() != Event::WakeUp) 
+        return;
+    WakeUp& e = static_cast<WakeUp&>(event);
+    handleEvents();
+    e.sched->add(40ms, this);
 }

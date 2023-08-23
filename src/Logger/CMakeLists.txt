@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.25)
+set(LOGGER_SOURCE DebugLogger.cpp Stopwatch.cpp)
+add_library(Logger STATIC ${LOGGER_SOURCE})
+target_link_libraries(Logger Common)
+target_include_directories(Logger PUBLIC ${PROJECT_SOURCE_DIR}/src)

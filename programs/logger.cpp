@@ -8,115 +8,16 @@
 #include <fstream>
 #include <random>
 
-#include "AccessLogger.h"
-#include "NotifyingIterator.h"
-#include "Common.h"
-#include "Exception.h"
+#include "Common/Common.h"
+#include "Common/Exception.h"
+#include "Logger/AccessLogger.h"
+#include "Logger/NotifyingIterator.h"
+#include "Logger/Recorder.h"
+#include "Logger/NullLogger.h"
+#include "Logger/MyAlgorithm.h"
+#include "Logger/RecordingSet.h"
 
-class NullLogger: public IEventHandler {
-public:
-    void handle(Event& e) override {}
-};
-
-using OriginalIterator = std::vector<int>::iterator;
-using NIter = NotifyingIterator<OriginalIterator>;
-
-
-
-//return two NotifyingIterators to begin and end of the data
-std::pair<NIter, NIter>
-getNI(std::vector<int>& data, IEventHandler& handler) {
-    auto begin = NotifyingIterator(data.begin(), data.begin(), handler);
-    auto end = NotifyingIterator(data.begin(), data.end(), handler);
-    return {begin, end};
-}
-
-//return three NotifyingIterators
-//1. begin, 2. begin + middlePos, 3. end
-std::tuple<NIter, NIter, NIter>
-getNI(std::vector<int>& data, IEventHandler& handler, size_t middlePos) {
-    assert(middlePos < data.size());
-    auto middle = NotifyingIterator(data.begin(), data.begin() + middlePos, handler);
-    auto [begin, end] = getNI(data, handler);
-    return {begin, middle, end};
-}
-
-std::string getPath(std::string_view algoName) {
-    std::string path{"logs/"};
-    path += algoName;
-    path += ".txt";
-    return path;
-}
-
-class Case {
-public:
-    using Container = std::vector<int>;
-    Case(const Container& data, std::string_view name, std::string_view info)
-    : data_(data)
-    , name_(name)
-    , info_(info)
-    , file_(getPath(name))
-    , logger_(data_, file_) {
-        if (!file_)
-            throw Exception("Can't open file ", getPath(name));
-        file_ << info << "\n";
-        file_ << data_ << "\n";
-    }
-
-    Case(const Container& data, std::string_view name)
-    : Case(data, name, name) {}
-
-    //return two NotifyingIterators to begin and end of the data
-    std::pair<NIter, NIter> getIterators() {
-        auto begin = NotifyingIterator(data_.begin(), data_.begin(), logger_);
-        auto end = NotifyingIterator(data_.begin(), data_.end(), logger_);
-        return {begin, end};
-    }
-
-    void finalize() {
-        logger_.finalize();
-    }
-private:
-    Container data_;
-    std::string_view name_;
-    std::string_view info_;
-    std::ofstream file_;
-    AccessLogger<Container> logger_;
-};
-
-TEST(std_algorithm, sort) {
-    std::vector<int> data = getRandVector(50, 1, 1000);
-
-    try {
-        Case sort(data, "sort");
-
-        auto [begin, end] = sort.getIterators();
-        std::sort(begin, end);
-
-        sort.finalize();
-    }
-    catch (const Exception& ex) {
-        FAIL() << ex.what() << "\n";
-    }
-}
-
-TEST(std_algorithm, small_sort) {
-    std::vector<int> data(10);
-    std::iota(data.rbegin(), data.rend(), 0);
-
-    std::ofstream file{getPath("small_sort")};
-    file << "small sort\n" << data << '\n';
-
-    AccessLogger logger{data, file};
-
-    auto begin_ = NotifyingIterator(data.begin(), data.begin(), logger);
-    auto end_ = NotifyingIterator(data.begin(), data.end(), logger);
-
-    std::sort(begin_, end_);
-
-    logger.finalize();
-}
-
+#if 0
 TEST(std_algorithm, nth_element) {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
@@ -339,37 +240,6 @@ TEST(std_algorithm, up_low_bound) {
     }
 }
 
-TEST(std_algorithm, reduce_accumulate) {
-    std::vector<int> data = getRandVector(50, 1, 1000);
-    int sum = std::accumulate(data.begin(), data.end(), 0);
-
-    {
-    std::ofstream file{getPath("reduce")};
-    file << "reduce\n" << data << '\n';
-
-    AccessLogger logger{data, file};
-
-    auto [begin, end] = getNI(data, logger);
-    int res = std::reduce(begin, end);
-    EXPECT_EQ(res, sum);
-
-    logger.finalize();
-    }
-    
-    {
-    std::ofstream file{getPath("accumulate")};
-    file << "accumulate\n" << data << '\n';
-
-    AccessLogger logger{data, file};
-
-    auto [begin, end] = getNI(data, logger);
-    int res = std::accumulate(begin, end, 0);
-    EXPECT_EQ(res, sum);
-
-    logger.finalize();
-    }
-}
-
 
 
 
@@ -378,21 +248,22 @@ TEST(std_algorithm, scan) {
     //int sum = std::accumulate(data.begin(), data.end(), 0);
 
     try {
+        auto startPoint = std::chrono::high_resolution_clock::now();
         //input data
-        Case srcCase(data, "inclusive_scan");
-        auto [begin, end] = srcCase.getIterators();
+        Recorder srcRecorder(data, "inclusive_scan", startPoint);
+        auto [begin, end] = srcRecorder.getIterators();
 
         //output data
         std::vector<int> result(10);
-        Case dstCase(result, "inclusive_scan_result");
+        Recorder dstRecorder(result, "inclusive_scan_result", startPoint);
 
-        auto [beginDst, endDst] = dstCase.getIterators();
+        auto [beginDst, endDst] = dstRecorder.getIterators();
 
         //algorithm
         std::inclusive_scan(begin, end, beginDst);
 
-        srcCase.finalize();
-        dstCase.finalize();
+        srcRecorder.finalize();
+        dstRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -400,20 +271,20 @@ TEST(std_algorithm, scan) {
     
     try {
         //input data
-        Case srcCase(data, "partial_sum");
-        auto [begin, end] = srcCase.getIterators();
+        Recorder srcRecorder(data, "partial_sum");
+        auto [begin, end] = srcRecorder.getIterators();
 
         //output data
         std::vector<int> result(10);
-        Case dstCase(result, "partial_sum_result");
+        Recorder dstRecorder(result, "partial_sum_result");
 
-        auto [beginDst, endDst] = dstCase.getIterators();
+        auto [beginDst, endDst] = dstRecorder.getIterators();
 
         //algorithm
         std::partial_sum(begin, end, beginDst);
 
-        srcCase.finalize();
-        dstCase.finalize();
+        srcRecorder.finalize();
+        dstRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -421,20 +292,20 @@ TEST(std_algorithm, scan) {
 
     try {
         //input data
-        Case srcCase(data, "exclusive_scan");
-        auto [begin, end] = srcCase.getIterators();
+        Recorder srcRecorder(data, "exclusive_scan");
+        auto [begin, end] = srcRecorder.getIterators();
 
         //output data
         std::vector<int> result(10);
-        Case dstCase(result, "exclusive_scan_result");
+        Recorder dstRecorder(result, "exclusive_scan_result");
 
-        auto [beginDst, endDst] = dstCase.getIterators();
+        auto [beginDst, endDst] = dstRecorder.getIterators();
 
         //algorithm
         std::exclusive_scan(begin, end, beginDst, 0);
 
-        srcCase.finalize();
-        dstCase.finalize();
+        srcRecorder.finalize();
+        dstRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -446,10 +317,10 @@ TEST(std_algorithm, heap) {
     std::vector<int> data = getRandVector(30, 1, 25);
 
     try {
-        Case case_(data, "make_heap");
-        auto [begin, end] = case_.getIterators();
+        Recorder recorder(data, "make_heap");
+        auto [begin, end] = recorder.getIterators();
         std::make_heap(begin, end);
-        case_.finalize();
+        recorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -458,40 +329,40 @@ TEST(std_algorithm, heap) {
     std::make_heap(data.begin(), data.end());
     
     try {
-        Case case_(data, "is_heap");
-        auto [begin, end] = case_.getIterators();
+        Recorder recorder(data, "is_heap");
+        auto [begin, end] = recorder.getIterators();
         std::is_heap(begin, end);
-        case_.finalize();
+        recorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
     }
 
     try {
-        Case case_(data, "push_heap");
-        auto [begin, end] = case_.getIterators();
+        Recorder recorder(data, "push_heap");
+        auto [begin, end] = recorder.getIterators();
         std::push_heap(begin, end);
-        case_.finalize();
+        recorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
     }
     
     try {
-        Case case_(data, "pop_heap");
-        auto [begin, end] = case_.getIterators();
+        Recorder recorder(data, "pop_heap");
+        auto [begin, end] = recorder.getIterators();
         std::pop_heap(begin, end);
-        case_.finalize();
+        recorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
     }
 
     try {
-        Case case_(data, "sort_heap");
-        auto [begin, end] = case_.getIterators();
+        Recorder recorder(data, "sort_heap");
+        auto [begin, end] = recorder.getIterators();
         std::sort_heap(begin, end);
-        case_.finalize();
+        recorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -514,18 +385,18 @@ TEST(std_algorithm, set) {
 
     try {
         //input data
-        Case ACase(A, "includes_A");
-        auto [beginA, endA] = ACase.getIterators();
+        Recorder ARecorder(A, "includes_A");
+        auto [beginA, endA] = ARecorder.getIterators();
 
-        Case CCase(C, "includes_C");
-        auto [beginC, endC] = CCase.getIterators();
+        Recorder CRecorder(C, "includes_C");
+        auto [beginC, endC] = CRecorder.getIterators();
 
         //algorithm
         bool result = std::includes(beginA, endA, beginC, endC);
         ASSERT_TRUE(result);
 
-        ACase.finalize();
-        CCase.finalize();
+        ARecorder.finalize();
+        CRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -533,20 +404,20 @@ TEST(std_algorithm, set) {
     
     try {
         //input data
-        Case ACase(A, "set_differrence_A");
-        auto [beginA, endA] = ACase.getIterators();
+        Recorder ARecorder(A, "set_differrence_A");
+        auto [beginA, endA] = ARecorder.getIterators();
 
-        Case BCase(B, "set_differrence_B");
-        auto [beginB, endB] = BCase.getIterators();
+        Recorder BRecorder(B, "set_differrence_B");
+        auto [beginB, endB] = BRecorder.getIterators();
 
-        Case RCase(R, "set_differrence_R");
-        auto [beginR, endR] = RCase.getIterators();
+        Recorder RRecorder(R, "set_differrence_R");
+        auto [beginR, endR] = RRecorder.getIterators();
 
         //algorithm
         std::set_difference(beginA, endA, beginB, endB, beginR);
-        ACase.finalize();
-        BCase.finalize();
-        RCase.finalize();
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -554,20 +425,20 @@ TEST(std_algorithm, set) {
     
     try {
         //input data
-        Case ACase(A, "set_intersection_A");
-        auto [beginA, endA] = ACase.getIterators();
+        Recorder ARecorder(A, "set_intersection_A");
+        auto [beginA, endA] = ARecorder.getIterators();
 
-        Case BCase(B, "set_intersection_B");
-        auto [beginB, endB] = BCase.getIterators();
+        Recorder BRecorder(B, "set_intersection_B");
+        auto [beginB, endB] = BRecorder.getIterators();
 
-        Case RCase(R, "set_intersection_R");
-        auto [beginR, endR] = RCase.getIterators();
+        Recorder RRecorder(R, "set_intersection_R");
+        auto [beginR, endR] = RRecorder.getIterators();
 
         //algorithm
         std::set_intersection(beginA, endA, beginB, endB, beginR);
-        ACase.finalize();
-        BCase.finalize();
-        RCase.finalize();
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -575,20 +446,20 @@ TEST(std_algorithm, set) {
     
     try {
         //input data
-        Case ACase(A, "set_symmetric_difference_A");
-        auto [beginA, endA] = ACase.getIterators();
+        Recorder ARecorder(A, "set_symmetric_difference_A");
+        auto [beginA, endA] = ARecorder.getIterators();
 
-        Case BCase(B, "set_symmetric_difference_B");
-        auto [beginB, endB] = BCase.getIterators();
+        Recorder BRecorder(B, "set_symmetric_difference_B");
+        auto [beginB, endB] = BRecorder.getIterators();
 
-        Case RCase(R, "set_symmetric_difference_R");
-        auto [beginR, endR] = RCase.getIterators();
+        Recorder RRecorder(R, "set_symmetric_difference_R");
+        auto [beginR, endR] = RRecorder.getIterators();
 
         //algorithm
         std::set_symmetric_difference(beginA, endA, beginB, endB, beginR);
-        ACase.finalize();
-        BCase.finalize();
-        RCase.finalize();
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
@@ -596,58 +467,203 @@ TEST(std_algorithm, set) {
     
     try {
         //input data
-        Case ACase(A, "set_union_A");
-        auto [beginA, endA] = ACase.getIterators();
+        Recorder ARecorder(A, "set_union_A");
+        auto [beginA, endA] = ARecorder.getIterators();
 
-        Case BCase(B, "set_union_B");
-        auto [beginB, endB] = BCase.getIterators();
+        Recorder BRecorder(B, "set_union_B");
+        auto [beginB, endB] = BRecorder.getIterators();
 
-        Case RCase(R, "set_union_R");
-        auto [beginR, endR] = RCase.getIterators();
+        Recorder RRecorder(R, "set_union_R");
+        auto [beginR, endR] = RRecorder.getIterators();
 
         //algorithm
         std::set_union(beginA, endA, beginB, endB, beginR);
-        ACase.finalize();
-        BCase.finalize();
-        RCase.finalize();
+        ARecorder.finalize();
+        BRecorder.finalize();
+        RRecorder.finalize();
     }
     catch (const Exception& ex) {
         FAIL() << ex.what();
     }
     
 }
+
+TEST(my_algorithm, copy) {
+    std::vector<int> src(3, 101);
+    std::vector<int> dst(3);
+    try {
+        auto startPoint = std::chrono::high_resolution_clock::now();
+        //input data
+        Recorder srcRecorder(src, "my_copy_src", startPoint);
+        auto [beginSrc, endSrc] = srcRecorder.getIterators();
+
+        Recorder dstRecorder(dst, "my_copy_dst", startPoint);
+        auto [beginDst, endDst] = dstRecorder.getIterators();
+
+        //algorithm
+        my::copy(beginSrc, endSrc, beginDst);
+        srcRecorder.finalize();
+        dstRecorder.finalize();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+
+}
+#endif
+
+TEST(std_algorithm, small_sort) {
+    std::vector<int> data(10);
+    std::iota(data.rbegin(), data.rend(), 1);
+
+    try {
+        //input data
+        RecordingSet set;
+        auto [first, last] = set.add("small_sort", data);
+
+        //algorithm
+        set.runStopwatch();
+        std::sort(first, last);
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+
+}
+
+TEST(my_algorithm, double_each) {
+    std::vector<int> src(3, 101);
+    try {
+        //input data
+        RecordingSet set;
+        auto [first, last] = set.add("double_each", src);
+
+        //algorithm
+        set.runStopwatch();
+        my::double_each(first, last);
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(std_algorithm, scan) {
+    std::vector<int> src = getRandVector(10, 1, 25);
+    std::vector<int> dst(10);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("inclusive_scan_src", src);
+        auto [f2, l2] = set.add("inclusive_scan_dst", dst);
+
+        std::inclusive_scan(f1, l1, f2);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(my_algorithm, copy_first) {
+    std::vector<int> src {101, 202, 303};
+    std::vector<int> dst(3, 0);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("copy_first_src", src);
+        auto [f2, l2] = set.add("copy_first_dst", dst);
+
+        my::copy_first(f1, l1, f2);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(std_algorithm, set) {
+    std::vector<int> A = getRandVector(20, 100, 199);
+    std::sort(A.begin(), A.end());
+
+    std::vector<int> C = getRandVector(10, 200, 299);
+    std::sort(C.begin(), C.end());
+
+    A.insert(A.end(), C.begin(), C.end()); //A += C
+    ASSERT_TRUE(std::is_sorted(A.begin(), A.end()));
+
+    std::vector<int> B = getRandVector(20, 300, 499);
+    std::sort(B.begin(), B.end());
+
+    B.insert(B.begin(), C.begin(), C.end()); //B += C
+    ASSERT_TRUE(std::is_sorted(B.begin(), B.end()));
+
+    std::vector<int> R(60);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("includes_A", A);
+        auto [f2, l2] = set.add("includes_C", C);
+        bool result = std::includes(f1, l1, f2, l2);
+        ASSERT_TRUE(result);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    
+}
+
+TEST(std_algorithm, sort) {
+    std::vector<int> data = getRandVector(50, 1, 1000);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("sort_50", data);
+        set.runStopwatch();
+        std::sort(f1, l1);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(std_algorithm, reduce_accumulate) {
+    std::vector<int> data = getRandVector(50, 1, 1000);
+    int sum = std::accumulate(data.begin(), data.end(), 0);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("reduce", data);
+        set.runStopwatch();
+        auto result = std::reduce(f1, l1);
+        set.save();
+        EXPECT_EQ(result, sum);
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("accumulate", data);
+        set.runStopwatch();
+        auto result = std::accumulate(f1, l1, 0);
+        set.save();
+        EXPECT_EQ(result, sum);
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-
-    //std::random_device rd;
-    //std::mt19937 g(rd());
-    //std::vector<int> data {10, 20};
-    //std::vector<int> data(100);
-    //std::iota(data.rbegin(), data.rend(), 0);
-    /*
-    for (int i = 0; i < 50; ++i) data.push_back(500);
-    std::vector<int> data(100);
-    std::iota(data.begin(), data.end(), 1);
-    
-    */
-
-
-    //std::sort(begin_, end_);
-    //std::rotate(begin_, middle_, end_);
-    //std::make_heap(begin_, middle_);
-    //std::sort_heap(begin_, middle_);
-    //std::find(begin_, end_, 10);
-    //std::partition(begin_, end_, [] (int x) { return x == 500; });
-    //std::shuffle(begin_, end_, g);
-    //int acc = std::accumulate(begin_, end_, 0);
-    //assert(acc == 45);
-    //std::iter_swap(begin_, begin_ + 1);
-    //std::lower_bound(begin_, end_, 10);
-    //assert(std::is_sorted(begin_, end_));
-    //assert(*std::max_element(begin_, end_) == 9);
-    //std::binary_search(begin_, end_, 1);
-
-
     return 0;
 }

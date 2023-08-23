@@ -7,8 +7,8 @@
 #include <cassert>
 #include <SDL2/SDL.h>
 
-#include "Common.h"
-#include "Exception.h"
+#include "Common/Common.h"
+#include "Common/Exception.h"
 
 //return rectangles what fills area and represents [first; last) as a chart diagram
 //TODO: Does it need maxSize? It will be change?
