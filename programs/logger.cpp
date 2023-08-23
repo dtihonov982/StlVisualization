@@ -18,47 +18,6 @@
 #include "Logger/RecordingSet.h"
 
 #if 0
-std::string getPath(std::string_view algoName) {
-    std::string path{"logs/"};
-    path += algoName;
-    path += ".txt";
-    return path;
-}
-
-//return two NotifyingIterators to begin and end of the data
-std::pair<NIter, NIter>
-getNI(std::vector<int>& data, IEventHandler& handler) {
-    auto begin = NotifyingIterator(data.begin(), data.begin(), handler);
-    auto end = NotifyingIterator(data.begin(), data.end(), handler);
-    return {begin, end};
-}
-
-//return three NotifyingIterators
-//1. begin, 2. begin + middlePos, 3. end
-std::tuple<NIter, NIter, NIter>
-getNI(std::vector<int>& data, IEventHandler& handler, size_t middlePos) {
-    assert(middlePos < data.size());
-    auto middle = NotifyingIterator(data.begin(), data.begin() + middlePos, handler);
-    auto [begin, end] = getNI(data, handler);
-    return {begin, middle, end};
-}
-
-TEST(std_algorithm, sort) {
-    std::vector<int> data = getRandVector(50, 1, 1000);
-
-    try {
-        Recorder sort(data, "sort");
-
-        auto [begin, end] = sort.getIterators();
-        std::sort(begin, end);
-
-        sort.finalize();
-    }
-    catch (const Exception& ex) {
-        FAIL() << ex.what() << "\n";
-    }
-}
-
 TEST(std_algorithm, nth_element) {
     std::vector<int> data(10);
     std::iota(data.rbegin(), data.rend(), 0);
@@ -278,37 +237,6 @@ TEST(std_algorithm, up_low_bound) {
 
     EXPECT_TRUE(std::all_of(first, last, [] (int x) { return x == 150; }));
 
-    }
-}
-
-TEST(std_algorithm, reduce_accumulate) {
-    std::vector<int> data = getRandVector(50, 1, 1000);
-    int sum = std::accumulate(data.begin(), data.end(), 0);
-
-    {
-    std::ofstream file{getPath("reduce")};
-    file << "reduce\n" << data << '\n';
-
-    AccessLogger logger{data, file};
-
-    auto [begin, end] = getNI(data, logger);
-    int res = std::reduce(begin, end);
-    EXPECT_EQ(res, sum);
-
-    logger.finalize();
-    }
-    
-    {
-    std::ofstream file{getPath("accumulate")};
-    file << "accumulate\n" << data << '\n';
-
-    AccessLogger logger{data, file};
-
-    auto [begin, end] = getNI(data, logger);
-    int res = std::accumulate(begin, end, 0);
-    EXPECT_EQ(res, sum);
-
-    logger.finalize();
     }
 }
 
@@ -594,6 +522,7 @@ TEST(std_algorithm, small_sort) {
         auto [first, last] = set.add("small_sort", data);
 
         //algorithm
+        set.runStopwatch();
         std::sort(first, last);
         set.save();
     }
@@ -687,6 +616,50 @@ TEST(std_algorithm, set) {
         FAIL() << ex.what();
     }
     
+}
+
+TEST(std_algorithm, sort) {
+    std::vector<int> data = getRandVector(50, 1, 1000);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("sort_50", data);
+        set.runStopwatch();
+        std::sort(f1, l1);
+
+        set.save();
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+}
+
+TEST(std_algorithm, reduce_accumulate) {
+    std::vector<int> data = getRandVector(50, 1, 1000);
+    int sum = std::accumulate(data.begin(), data.end(), 0);
+
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("reduce", data);
+        set.runStopwatch();
+        auto result = std::reduce(f1, l1);
+        set.save();
+        EXPECT_EQ(result, sum);
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
+    try {
+        RecordingSet set;
+        auto [f1, l1] = set.add("accumulate", data);
+        set.runStopwatch();
+        auto result = std::accumulate(f1, l1, 0);
+        set.save();
+        EXPECT_EQ(result, sum);
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
 }
 
 int main(int argc, char** argv) {
