@@ -2,17 +2,20 @@
 #include "Common/Exception.h"
 #include "Visual/Player.h"
 
+using namespace std::chrono;
 
-Player Player::makePlayer(const SDL_Rect& rect, std::string_view filename) {
+Player Player::makePlayer(const SDL_Rect& rect, uint64_t delayRatio, std::string_view filename) {
     Record record = Record::load(filename);
-    return Player(rect, record.info, record.data, record.script);
+    return Player(rect, delayRatio, record.info, record.data, record.script);
 }
 
 Player::Player(const SDL_Rect& geom, 
+               uint64_t delayRatio,
                const std::string& title, 
                const std::vector<int>& data, 
                const Script& script)
-: title_(title)
+: delayRatio_(delayRatio)
+, title_(title)
 , data_(data)
 , script_(script) 
 {
@@ -31,6 +34,34 @@ void Player::update() {
     }
 
     Action action = script_[currScriptPos_];
+    handleAction(action);
+
+    ++currScriptPos_;
+
+    if (currScriptPos_ >= script_.size()) {
+        status_ = Done;
+        return;
+    }
+
+    // Invariant: at this moment there is previus and current element
+    // because the status is not Done and the script is not empty
+
+    Action next = script_[currScriptPos_];
+    uint64_t delay = next.timePoint - action.timePoint;
+}
+
+uint64_t Player::getMsToNextAction() const {
+    assert(currScriptPos_ < script_.size());
+    const Action& curr = script_[currScriptPos_];
+    uint64_t rawDelay = curr.timePoint;
+    if (currScriptPos_ > 0) {
+        const Action& prev = script_[currScriptPos_ - 1];
+        rawDelay -= prev.timePoint;
+    }
+    return rawDelay / delayRatio_;
+}
+
+void Player::handleAction(const Action& action) {
     if (action.type == Action::ACCESS) {
         chart_.setElementColor(action.pos, {255, 255, 255, 255});
         markedPos_.push(action.pos);
@@ -42,11 +73,6 @@ void Player::update() {
         chart_.setElementColor(action.pos, {255, 255, 255, 255});
         markedPos_.push(action.pos);
     }
-
-    ++currScriptPos_;
-
-    if (currScriptPos_ >= script_.size())
-        status_ = Done;
 }
 
 void Player::toggleStatus() {
@@ -60,4 +86,33 @@ void Player::toggleStatus() {
 
 void Player::draw(SDL_Renderer* renderer) {
     chart_.draw(renderer);
+}
+
+void Player::handle(Event& event) {
+    if (status_ == Done)
+        return;
+
+    if (event.getType() != Event::WakeUp) 
+        return;
+    WakeUp& e = static_cast<WakeUp&>(event);
+
+    if (status_ != Pause) {
+        //back colors to default
+        while (!markedPos_.empty()) {
+            chart_.resetElementColor(markedPos_.top());
+            markedPos_.pop();
+        }
+
+        Action action = script_[currScriptPos_];
+        handleAction(action);
+
+        ++currScriptPos_;
+
+        if (currScriptPos_ >= script_.size()) {
+            status_ = Done;
+            return;
+        }
+    }
+
+    e.sched->add(milliseconds(getMsToNextAction()), this);
 }

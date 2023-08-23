@@ -1,9 +1,12 @@
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
+
 #include <chrono>
 #include <set>
 #include <thread>
+#include <memory>
 
-#include "Exception.h"
-
+#include "Common/Exception.h"
 
 template <typename Task>
 struct earlier {
@@ -49,3 +52,8 @@ public:
 private:
     std::set<Task, earlier<Task>> units_;
 };
+
+template <typename T>
+using SchedulerPtr = Scheduler<T>*;
+
+#endif //SCHEDULER_H

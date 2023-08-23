@@ -2,10 +2,13 @@
 #define EVENT_H
 
 #include <string>
+#include <memory>
+
+#include "Visual/Scheduler.h"
 
 class Event {
 public:
-    enum Type { Message, Access };  
+    enum Type { Message, Access, WakeUp};  
     Type getType() { return type_; }  
     virtual ~Event() {}
 protected:
@@ -19,6 +22,8 @@ public:
     virtual void handle(Event& event) = 0;
     virtual ~IEventHandler() {}
 };
+
+using IEventHandlerPtr = IEventHandler*;
 
 class Message: public Event {
 public:
@@ -38,6 +43,14 @@ public:
     size_t getPos() const { return pos_; }
 private:
     size_t pos_;
+};
+
+struct WakeUp: public Event {
+    WakeUp(const SchedulerPtr<IEventHandlerPtr>& scheduler)
+    : Event(Event::WakeUp) 
+    , sched(scheduler) 
+    {}
+    SchedulerPtr<IEventHandlerPtr> sched;
 };
 
 #endif //EVENT_H
