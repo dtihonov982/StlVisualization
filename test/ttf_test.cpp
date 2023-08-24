@@ -1,7 +1,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
 #include <iostream>
-#include "Visual/Label.h"
+#include "Label.h"
 
 int main() {
     SDL_Window* window;
@@ -24,23 +24,15 @@ int main() {
 
     TTF_Init();
 
-    Label label(renderer);
-    label.setText("Some text here.");
-    label.setFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 32);
-    label.setColor({0xff, 0xff, 0xff, 0xff});
-    label.update();
-    int labelWidth = label.getWidth();
-    int labelHeight = label.getHeight();
-    label.setPos(width / 2 - labelWidth / 2, height / 2 - labelHeight / 2);
-    SDL_Rect labelRect = label.getRect();
-    SDL_SetRenderDrawColor( renderer, 0x88, 0x88, 0x88, 0x88);
-    SDL_RenderFillRect(renderer, &labelRect);
+    {
+    Label label(renderer, 10, 10, "This is a text!\nWHOOOAAA!",
+                "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
+                , 14, {0xff, 0xff, 0xff, 0xff});
     label.draw();
-    
 
 	SDL_RenderPresent(renderer);
     SDL_Delay(3000);
-
+    }
 	SDL_DestroyWindow(window);
     std::cerr << SDL_GetError() << "\n";
 	SDL_DestroyRenderer(renderer);
