@@ -22,22 +22,24 @@ public:
     ~App();
     void run();
     void handleEvents();
-    void update();
     void render();
     void handleKeyDown(SDL_Event& event);
     bool isRunning() { return isRunning_; }
-    static std::vector<SDL_Rect>
-    emplaceBlocks(int count, 
-                  int width, 
-                  int height, 
-                  float gapRatio = 0.90f);
     void initScheduler();
+    void initGraphics();
+    void createPlayers(uint64_t delayRatio, const std::vector<std::string_view>& files);
     void handle(Event& event) override;
 private:
     Scheduler<IEventHandlerPtr> sched_;
     std::vector<Player> players_;
     SDL_Window* window_;
+    int windowWidth_;
+    int windowHeight_;
     SDL_Renderer* renderer_;
     bool isRunning_ = false;
 };
+
+static std::vector<SDL_Rect>
+getGrid(int count, int width, int height, float gapRatio = 0.90f);
+
 #endif // APP_H

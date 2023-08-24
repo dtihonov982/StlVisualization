@@ -14,22 +14,26 @@
 class Player: public IEventHandler {
 public:
     enum Status { Play, Pause, Done };
-    Player(const SDL_Rect& geom, 
+    Player(SDL_Renderer* renderer,
+           const SDL_Rect& geom, 
            uint64_t delayRatio,
            const std::string& title, 
            const std::vector<int>& data, 
            const Script& script);
-    void update();
-    void draw(SDL_Renderer* renderer);
+    void draw();
     void toggleStatus();
     Status getStatus() { return status_;  }
     void setStatus(Status status) { status_ = status; }
-    static Player makePlayer(const SDL_Rect& rect, uint64_t delayRatio, std::string_view filename);
-    void handleAction(const Action& action);
-    uint64_t getMsToNextAction() const;
+    static Player makePlayer(SDL_Renderer* renderer, const SDL_Rect& rect, uint64_t delayRatio, std::string_view filename);
     void handle(Event& event) override;
+    std::chrono::milliseconds getMsToNextAction() const;
 private:
+    void handleAction(const Action& action);
+
+    SDL_Renderer* renderer_;
+
     uint64_t delayRatio_;
+    void dropMarkedElements();
     std::string title_;
     std::vector<int> data_;
     std::stack<int> markedPos_;

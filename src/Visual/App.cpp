@@ -4,12 +4,36 @@
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float gapRatio) {
+
+App::App(uint64_t delayRatio, const std::vector<std::string_view>& files) {
+    windowWidth_ = 1024;
+    windowHeight_ = 640;
+    
+    initGraphics();
+    createPlayers(delayRatio, files);
+}
+
+void App::createPlayers(uint64_t delayRatio, const std::vector<std::string_view>& files) {
+    size_t count = files.size();
+    std::vector<SDL_Rect> blocks = getGrid(count, windowWidth_, windowHeight_);
+    for (size_t i = 0; i < count; ++i) {
+        try {
+            Player curr = Player::makePlayer(renderer_, blocks[i], delayRatio, files[i]);
+            players_.push_back(std::move(curr));
+        }
+        catch (const Exception& ex) {
+            std::cerr << "Error while creating player for " << files[i] << "\n";
+            throw ex;
+        }
+    }
+}
+    
+std::vector<SDL_Rect> getGrid(int cellsCount, int totalWidth, int totalHeight, float cellRatio) {
     std::vector<SDL_Rect> blocks;
-    int blockWidth = width * gapRatio;
-    int gap = (width - blockWidth) / 2;
-    int blockHeight = (height - gap * (count + 1)) / count;
-    for (int i = 0; i < count; ++i) {
+    int blockWidth = totalWidth * cellRatio;
+    int gap = (totalWidth - blockWidth) / 2;
+    int blockHeight = (totalHeight - gap * (cellsCount + 1)) / cellsCount;
+    for (int i = 0; i < cellsCount; ++i) {
         SDL_Rect curr;
         curr.x = gap;
         curr.y = gap + i * (blockHeight + gap);
@@ -20,24 +44,7 @@ std::vector<SDL_Rect> App::emplaceBlocks(int count, int width, int height, float
     return blocks;
 }
 
-App::App(uint64_t delayRatio, const std::vector<std::string_view>& files) {
-    
-    int windowWidth = 1024;
-    int windowHeight = 640;
-
-    size_t count = files.size();
-    std::vector<SDL_Rect> blocks = emplaceBlocks(count, windowWidth, windowHeight);
-    for (size_t i = 0; i < count; ++i) {
-        try {
-            Player curr = Player::makePlayer(blocks[i], delayRatio, files[i]);
-            players_.push_back(std::move(curr));
-        }
-        catch (const Exception& ex) {
-            std::cerr << "Error while creating player for " << files[i] << "\n";
-            throw ex;
-        }
-    }
-    
+void App::initGraphics() {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         throw Exception("SDL initiation error.");
     }
@@ -45,7 +52,7 @@ App::App(uint64_t delayRatio, const std::vector<std::string_view>& files) {
     window_ = SDL_CreateWindow("Title", 
                     SDL_WINDOWPOS_CENTERED, 
                     SDL_WINDOWPOS_CENTERED, 
-                    windowWidth, windowHeight, 0);
+                    windowWidth_, windowHeight_, 0);
     if (!window_)
         throw Exception("Window creating error.");
 
@@ -55,7 +62,6 @@ App::App(uint64_t delayRatio, const std::vector<std::string_view>& files) {
 
     isRunning_ = true;
 }
-
 
 void App::run() {
     initScheduler();
@@ -67,16 +73,19 @@ void App::run() {
     }
 }
 
-void App::initScheduler() {
-    for (auto& player: players_)
-        sched_.add(milliseconds(player.getMsToNextAction()), &player);
-    // TODO: ups as class member
-    sched_.add(40ms, this);
+void App::handle(Event& event) {
+    if (event.getType() != Event::WakeUp) 
+        return;
+    WakeUp& e = static_cast<WakeUp&>(event);
+    handleEvents();
+    e.sched->add(40ms, this);
 }
 
-void App::update() {
+void App::initScheduler() {
     for (auto& player: players_)
-        player.update();
+        sched_.add(player.getMsToNextAction(), &player);
+    // TODO: ups as class member
+    sched_.add(40ms, this);
 }
 
 void App::handleEvents() {
@@ -102,11 +111,11 @@ void App::handleKeyDown(SDL_Event& event) {
 }
 
 void App::render() {
-    SDL_SetRenderDrawColor(renderer_, 0x00,   0x3f,   0x5c, 255);
+    SDL_SetRenderDrawColor(renderer_, 0x00, 0x3f, 0x5c, 0xff);
     SDL_RenderClear(renderer_);
 
     for (auto& player: players_)
-        player.draw(renderer_);
+        player.draw();
 
     SDL_RenderPresent(renderer_);
 }
@@ -118,11 +127,3 @@ App::~App() {
     SDL_Quit();
 }
 
-
-void App::handle(Event& event) {
-    if (event.getType() != Event::WakeUp) 
-        return;
-    WakeUp& e = static_cast<WakeUp&>(event);
-    handleEvents();
-    e.sched->add(40ms, this);
-}
