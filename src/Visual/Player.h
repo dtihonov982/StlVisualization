@@ -10,12 +10,13 @@
 #include "Common/Script.h"
 #include "Logger/Event.h"
 #include "Visual/Scheduler.h"
+#include "Visual/Label.h"
 
 class Player: public IEventHandler {
 public:
     enum Status { Play, Pause, Done };
     Player(SDL_Renderer* renderer,
-           const SDL_Rect& geom, 
+           const SDL_Rect& area, 
            uint64_t delayRatio,
            const std::string& title, 
            const std::vector<int>& data, 
@@ -30,7 +31,12 @@ public:
 private:
     void handleAction(const Action& action);
 
+    void initLabel();
+    void arrangeElements(const SDL_Rect& area);
+
     SDL_Renderer* renderer_;
+    Label label_;
+    static constexpr int chartLabelSpace = 20;
 
     uint64_t delayRatio_;
     void dropMarkedElements();

@@ -45,6 +45,7 @@ std::vector<SDL_Rect> getGrid(int cellsCount, int totalWidth, int totalHeight, f
 }
 
 void App::initGraphics() {
+    TTF_Init();
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         throw Exception("SDL initiation error.");
     }

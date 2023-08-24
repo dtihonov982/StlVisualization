@@ -10,7 +10,7 @@ Player Player::makePlayer(SDL_Renderer* renderer, const SDL_Rect& rect, uint64_t
 }
 
 Player::Player(SDL_Renderer* renderer,
-               const SDL_Rect& geom, 
+               const SDL_Rect& area, 
                uint64_t delayRatio,
                const std::string& title, 
                const std::vector<int>& data, 
@@ -20,9 +20,32 @@ Player::Player(SDL_Renderer* renderer,
 , title_(title)
 , data_(data)
 , script_(script) 
+, label_(renderer_)
 {
-    chart_.setGeometry(geom);
+    initLabel();
+    arrangeElements(area);
     chart_.update(data_.begin(), data_.end());
+}
+
+void Player::arrangeElements(const SDL_Rect& area) {
+    int labelWidth = label_.getWidth();
+    int labelHeight = label_.getHeight();
+
+    int chartAreaHeight = area.h - labelHeight - chartLabelSpace;
+    SDL_Rect chartArea {area.x, area.y, area.w, chartAreaHeight};
+
+    int labelX = area.x + (area.w - labelWidth) / 2;
+    int labelY = (area.y + area.h - labelHeight);
+    label_.setPos(labelX, labelY);
+
+    chart_.setGeometry(chartArea);
+}
+
+void Player::initLabel() {
+    label_.setText(title_);
+    label_.setFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 24);
+    label_.setColor({0xff, 0xff, 0xff, 0xff});
+    label_.update();
 }
 
 void Player::handle(Event& event) {
@@ -99,5 +122,6 @@ void Player::toggleStatus() {
 
 void Player::draw() {
     chart_.draw(renderer_);
+    label_.draw();
 }
 
