@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <string_view>
+#include <memory>
+
 #include "Common/Exception.h"
 
 class Label {
@@ -12,25 +14,12 @@ public:
     : renderer_(renderer) {
     }
 
-    void draw() {
-        SDL_RenderCopy(renderer_, texture_, NULL, &textureRect_);
-    }
-
     void setText(std::string_view text) {
         text_ = text;
     }
 
     void setColor(const SDL_Color& color) {
         color_ = color;
-    }
-
-    void update() {
-        SDL_Surface* surface =
-            TTF_RenderText_Blended_Wrapped(font_, text_.c_str(), color_, 0); 
-        texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
-        SDL_FreeSurface(surface);
-        // Update label width and height
-        SDL_QueryTexture(texture_, nullptr, nullptr, &textureRect_.w, &textureRect_.h);
     }
 
     int getWidth() {
@@ -47,19 +36,34 @@ public:
     }
 
     void setFont(std::string_view font, int size) {
-        font_ = TTF_OpenFont(font.data(), size);
-        if (!font_)
+        TTF_Font* fontRaw = TTF_OpenFont(font.data(), size);
+        if (!fontRaw)
             throw Exception(TTF_GetError());
+        font_.reset(fontRaw);
     }
 
     SDL_Rect getRect() { return textureRect_; }
+
+    void update() {
+        SDL_Surface* surface =
+            TTF_RenderText_Blended_Wrapped(font_.get(), text_.c_str(), color_, 0); 
+        texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
+        SDL_FreeSurface(surface);
+        // Update label width and height
+        SDL_QueryTexture(texture_, nullptr, nullptr, &textureRect_.w, &textureRect_.h);
+    }
+
+    void draw() {
+        SDL_RenderCopy(renderer_, texture_, NULL, &textureRect_);
+    }
 
     ~Label() {
 
     }
 private:
     SDL_Rect textureRect_ = {0, 0, 0, 0};
-    TTF_Font* font_;
+    using FontPtr = std::unique_ptr<TTF_Font, decltype(&TTF_CloseFont)>;
+    FontPtr font_{nullptr, &TTF_CloseFont};
     std::string text_;
     SDL_Color color_;
     SDL_Texture* texture_;
