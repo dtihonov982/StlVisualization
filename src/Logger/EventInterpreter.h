@@ -65,36 +65,33 @@ public:
 
 private:
     // TODO: save in class member
-    bool getLastAccess(Action& dst) const {
-        auto it = std::find_if(script_.crbegin(), script_.crend(),
-            [] (const Action& action) {
-                return action.type == Action::ACCESS;
-            });
-        if (it != script_.crend()) {
-            dst = *it;
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+    using value_type = typename Container::value_type;
 
     void checkWriting() {
-        Action lastAccess;
+        // Time point for writing - time of last access
+        // Before check writing script is empty or last elements of it is Access.
         uint64_t writingPoint;
-        if (getLastAccess(lastAccess)) {
-            writingPoint = lastAccess.timePoint;
+        if (!script_.empty()) {
+            auto lastAccess = script_.end() - 1;
+            writingPoint = lastAccess->timePoint;
+            auto lastAccessPos = lastAccess->pos;
+            // Delete last access if after it was writing.
+            if ( (*original_)[lastAccessPos] != copy_[lastAccessPos] )
+                script_.pop_back();
         }
         else {
             writingPoint = stopwatch_->elapsedNanoseconds();
         }
-        //TODO:delete last access if positions of writing and access are the same.
+        // Scan container if was changes and where it was.
         for (size_t i = 0; i < copy_.size(); ++i) {
             auto mutableContainerValue = (*original_)[i];
             if (copy_[i] != mutableContainerValue) {
+                // If was changes then add Write action in script
                 Action action{writingPoint, Action::WRITE, i, mutableContainerValue};
                 script_.push_back(action);
+                // update copy to container for correct next write checking.
                 copy_[i] = mutableContainerValue;
+                // if writing pos and last access pos is the same then delete access action
             }
         }
     }
