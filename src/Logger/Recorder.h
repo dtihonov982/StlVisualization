@@ -10,7 +10,9 @@
 #include <filesystem>
 
 #include "Common/Exception.h"
+#include "Common/Common.h"
 #include "Logger/EventInterpreter.h"
+#include "Logger/NotifyingIterator.h"
 
 using OriginalIterator = std::vector<int>::iterator;
 using NIter = NotifyingIterator<OriginalIterator>;
