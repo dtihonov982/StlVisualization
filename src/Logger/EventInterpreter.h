@@ -49,6 +49,7 @@ public:
         // The time of interpretation of events must not interact to information about writing and access time.
         pause_guard pause(*stopwatch_);
 
+        // Before check writing script is empty or last elements of it is Access.
         checkWriting();
 
         Access& accEvent = static_cast<Access&>(event);
@@ -69,7 +70,6 @@ private:
 
     void checkWriting() {
         // Time point for writing - time of last access
-        // Before check writing script is empty or last elements of it is Access.
         uint64_t writingPoint;
         if (!script_.empty()) {
             auto lastAccess = script_.end() - 1;
