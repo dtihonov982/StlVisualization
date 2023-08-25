@@ -22,3 +22,11 @@ SDL_Rect roundRect(float x, float y, float w, float h) {
             static_cast<int>(w), static_cast<int>(h) };
 }
 
+SDL_Color toSDLColor(Color color) noexcept {
+    SDL_Color res;
+    res.r = (color >> 24) & 0xff;
+    res.g = (color >> 16) & 0xff;
+    res.b = (color >> 8)  & 0xff;
+    res.a = color         & 0xff;
+    return res;
+}

@@ -35,6 +35,7 @@ private:
     std::vector<Player> players_;
     std::shared_ptr<Config> config_;
     SDL_Window* window_;
+    SDL_Color backgroundColor_;
     int windowWidth_;
     int windowHeight_;
     SDL_Renderer* renderer_;

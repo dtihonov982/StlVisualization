@@ -23,6 +23,8 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
     return os;
 }
 
+using Color = long long;
+SDL_Color toSDLColor(Color color) noexcept;
 
 SDL_Rect roundRect(float x, float y, float w, float h);
 #endif // COMMON_H

@@ -1,4 +1,5 @@
 #include "App.h"
+#include "Common/Common.h"
 #include <fstream>
 
 using namespace std::chrono;
@@ -9,6 +10,8 @@ App::App(uint64_t delayRatio, const std::vector<std::string_view>& files, const 
 : config_(std::make_shared<Config>(config)) {
     windowWidth_ = config_->get<int>("WindowWidth", 1024);
     windowHeight_ = config_->get<int>("WindowHeight", 640);
+    Color backgroundColorRaw = config_->get<Color>("BackgroundColor", 0x00000000);
+    backgroundColor_ = toSDLColor(backgroundColorRaw);
     initGraphics();
     createPlayers(delayRatio, files);
 }
@@ -112,7 +115,9 @@ void App::handleKeyDown(SDL_Event& event) {
 }
 
 void App::render() {
-    SDL_SetRenderDrawColor(renderer_, 0x00, 0x3f, 0x5c, 0xff);
+    SDL_SetRenderDrawColor(renderer_, 
+        backgroundColor_.r, backgroundColor_.g, 
+        backgroundColor_.b, backgroundColor_.a);
     SDL_RenderClear(renderer_);
 
     for (auto& player: players_)
