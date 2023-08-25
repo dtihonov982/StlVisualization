@@ -13,12 +13,13 @@
 #include "Visual/Scheduler.h"
 #include "Common/Script.h"
 #include "Logger/Event.h"
+#include "Common/Config.h"
 
 using PlayerScheduler = Scheduler<size_t>;
 
 class App: public IEventHandler {
 public:
-    App(uint64_t delayRatio, const std::vector<std::string_view>& files);
+    App(uint64_t delayRatio, const std::vector<std::string_view>& files, const Config& config);
     ~App();
     void run();
     void handleEvents();
@@ -32,6 +33,7 @@ public:
 private:
     Scheduler<IEventHandlerPtr> sched_;
     std::vector<Player> players_;
+    std::shared_ptr<Config> config_;
     SDL_Window* window_;
     int windowWidth_;
     int windowHeight_;

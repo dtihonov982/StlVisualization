@@ -1,4 +1,5 @@
 #include "Visual/App.h"
+#include "Common/Config.h"
 #include <string>
 #include <iostream>
 #include <string_view>
@@ -21,8 +22,10 @@ int main(int argc, char** argv) {
 
     std::vector<std::string_view> filenames(argv + 2, argv + argc);
 
+    Config config{"config.txt"};
+
     try {
-        App app(delayRatio, filenames);
+        App app(delayRatio, filenames, config);
         app.run();
     }
     catch (const Exception& ex) {

@@ -5,10 +5,10 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 
-App::App(uint64_t delayRatio, const std::vector<std::string_view>& files) {
-    windowWidth_ = 1024;
-    windowHeight_ = 640;
-    
+App::App(uint64_t delayRatio, const std::vector<std::string_view>& files, const Config& config)
+: config_(std::make_shared<Config>(config)) {
+    windowWidth_ = config_->get<int>("WindowWidth", 1024);
+    windowHeight_ = config_->get<int>("WindowHeight", 640);
     initGraphics();
     createPlayers(delayRatio, files);
 }
