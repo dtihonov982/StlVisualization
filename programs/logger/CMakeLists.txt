@@ -9,6 +9,7 @@ set (SRCS reduce_accumulate.cpp
           adjacent_difference.cpp
           partition.cpp
           merge.cpp
+          transform_numeric.cpp
 )
 add_executable(logger ${SRCS})
 target_link_libraries(logger PRIVATE Logger GTest::GTest GTest::Main)
