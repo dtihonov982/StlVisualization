@@ -11,7 +11,7 @@ TEST(std_algorithm, adjacent_difference) {
     std::vector<int> result(50);
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(data)> set;
         auto [f1, l1] = set.add("adjacent_difference_src", data);
         auto [f2, l2] = set.add("adjacent_difference_dst", result);
         set.runStopwatch();

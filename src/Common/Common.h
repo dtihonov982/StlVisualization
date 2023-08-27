@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string_view>
+#include <list>
 
 #include <SDL2/SDL.h> 
 

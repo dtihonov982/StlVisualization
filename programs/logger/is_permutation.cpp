@@ -18,7 +18,7 @@ TEST(std_algorithm, is_permutation) {
     std::shuffle(second.begin(), second.end(), rng);
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(first)> set;
         auto [f1, l1] = set.add("is_permutation_first", first);
         auto [f2, l2] = set.add("is_permutation_second", second);
         set.runStopwatch();

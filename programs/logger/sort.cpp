@@ -10,7 +10,7 @@ TEST(std_algorithm, sort) {
     std::vector<int> data = getRandVector(50, 1, 1000);
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(data)> set;
         auto [f1, l1] = set.add("sort_50", data);
         set.runStopwatch();
         std::sort(f1, l1);

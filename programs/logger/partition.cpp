@@ -17,7 +17,7 @@ TEST(std_algorithm, partition) {
     std::shuffle(data.begin(), data.end(), rng);
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(data)> set;
         auto [f1, l1] = set.add("partition", data);
         set.runStopwatch();
         std::partition(f1, l1, [partitionValue] (int x) { return x == partitionValue; });

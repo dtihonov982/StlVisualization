@@ -15,7 +15,7 @@ TEST(std_algorithm, merge) {
     
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(a)> set;
         auto [f1, l1] = set.add("merge_first", a);
         auto [f2, l2] = set.add("merge_second", b);
         auto [f3, l3] = set.add("merge_result", result);

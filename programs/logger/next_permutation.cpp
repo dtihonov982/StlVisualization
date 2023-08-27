@@ -14,7 +14,7 @@ TEST(std_algorithm, next_permutation) {
     std::iota(data.rbegin(), data.rend(), 1);
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(data)> set;
         auto [f1, l1] = set.add("next_permutation", data);
         set.runStopwatch();
         for (int i = 0; i < 720; ++i)

@@ -3,6 +3,7 @@ find_package(GTest REQUIRED)
 
 set (SRCS reduce_accumulate.cpp
           sort.cpp
+          #sort_list.cpp
           shuffle.cpp
           next_permutation.cpp
           is_permutation.cpp

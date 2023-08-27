@@ -7,16 +7,16 @@
 #include "Logger/Stopwatch.h"
 
 // RecordingSet organizes recording of algorithms that gets many data as input (std::merge etc.).
+template <typename Container>
 class RecordingSet {
 public:
-    using Container = std::vector<int>;
 
-    std::pair<NIter, NIter> add(const std::string& name, const Container& data) {
+    std::pair<NIter<Container>, NIter<Container>> add(const std::string& name, const Container& data) {
         recorders_.emplace(name, Recorder {name, data, synchTime_});
         return getIterators(name);
     }
 
-    std::pair<NIter, NIter> add(const std::string& name, const std::string& info, const Container& data) {
+    std::pair<NIter<Container>, NIter<Container>> add(const std::string& name, const std::string& info, const Container& data) {
         recorders_.emplace(name, Recorder {name, info, data, synchTime_});
         return getIterators(name);
     }
@@ -26,7 +26,7 @@ public:
         synchTime_->start();
     }
 
-     std::pair<NIter, NIter> getIterators(const std::string& name) {
+     std::pair<NIter<Container>, NIter<Container>> getIterators(const std::string& name) {
         auto it = recorders_.find(name);
         if (it != recorders_.end()) {
             return it->second.getIterators();
@@ -42,7 +42,7 @@ public:
     }
 
 private:
-    std::unordered_map<std::string, Recorder> recorders_;
+    std::unordered_map<std::string, Recorder<Container>> recorders_;
     std::shared_ptr<Stopwatch> synchTime_ = std::make_shared<Stopwatch>();
 };
 

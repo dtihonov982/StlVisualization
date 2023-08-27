@@ -16,7 +16,7 @@ TEST(std_algorithm, transform_numeric) {
     auto bin_transform = [] (int x, int y) { return x + y; };
 
     try {
-        RecordingSet set;
+        RecordingSet<decltype(input)> set;
         auto [f1, l1] = set.add("transform_reduce_input", input);
         auto [f2, l2] = set.add("transform_reduce_output", output);
         set.runStopwatch();

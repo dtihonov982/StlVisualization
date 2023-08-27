@@ -14,15 +14,15 @@
 #include "Logger/EventInterpreter.h"
 #include "Logger/NotifyingIterator.h"
 
-using OriginalIterator = std::vector<int>::iterator;
-using NIter = NotifyingIterator<OriginalIterator>;
+template <typename Container>
+using NIter = NotifyingIterator<typename Container::iterator>;
 
 namespace fs = std::filesystem;
 
 //Create recording and save it in file
+template <typename Container>
 class Recorder {
 public:
-    using Container = std::vector<int>;
 
     Recorder(const std::string& name, const Container& data)
     : data_(std::make_shared<Container>(data))
@@ -55,7 +55,8 @@ public:
     }
 
     //return two NotifyingIterators to begin and end of the data
-    std::pair<NIter, NIter> getIterators() {
+    std::pair<NIter<Container>, NIter<Container>> 
+    getIterators() {
         auto begin = NotifyingIterator(data_->begin(), data_->begin(), interpreter_);
         auto end = NotifyingIterator(data_->begin(), data_->end(), interpreter_);
         return {begin, end};
