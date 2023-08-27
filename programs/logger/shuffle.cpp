@@ -16,7 +16,7 @@ TEST(std_algorithm, shuffle) {
 
     try {
         RecordingSet set;
-        auto [f1, l1] = set.add("shuffle", data);
+        auto [f1, l1] = set.add("shuffle", "shuffling 100 elements", data);
         set.runStopwatch();
         std::shuffle(f1, l1, rng);
 

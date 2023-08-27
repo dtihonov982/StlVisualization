@@ -16,6 +16,11 @@ public:
         return getIterators(name);
     }
 
+    std::pair<NIter, NIter> add(const std::string& name, const std::string& info, const Container& data) {
+        recorders_.emplace(name, Recorder {name, info, data, synchTime_});
+        return getIterators(name);
+    }
+
     // Call this method before an algorithm execution to minimize start delay in a record playing.
     void runStopwatch() {
         synchTime_->start();

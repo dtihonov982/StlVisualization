@@ -43,6 +43,17 @@ public:
     , interpreter_(data_, stopwatch_) {
     }
 
+    Recorder(std::string_view name,
+             std::string_view info,
+             const Container& data, 
+             const std::shared_ptr<Stopwatch>& stopwatch_)
+    : data_(std::make_shared<Container>(data))
+    , dataOriginal_(data)
+    , name_(name)
+    , info_(info)
+    , interpreter_(data_, stopwatch_) {
+    }
+
     //return two NotifyingIterators to begin and end of the data
     std::pair<NIter, NIter> getIterators() {
         auto begin = NotifyingIterator(data_->begin(), data_->begin(), interpreter_);
