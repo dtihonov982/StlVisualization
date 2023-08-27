@@ -1,4 +1,5 @@
 #include "Common/Config.h"
+#include "Common/Exception.h"
 
 Config::Config(std::filesystem::path filename) {
 	std::ifstream istream{filename};  
@@ -20,6 +21,33 @@ std::smatch Config::parseString(const std::string& input) {
     return matches;
 }
 
+void ltrim(std::string& str) {
+    auto it = std::find_if_not(str.begin(), str.end(), [](char c) { return c == ' '; });
+    str.erase(str.begin(), it);
+}
+
+void rtrim(std::string& str) {
+    auto it = std::find_if_not(str.rbegin(), str.rend(), [](char c) { return c == ' '; });
+    // ??? why not -1
+    str.erase(it.base(), str.end());
+}
+
+void trim(std::string& str) {
+    ltrim(str);
+    rtrim(str);
+}
+
+std::pair<std::string, std::string> getNameAndValue(const std::string& line) {
+    auto n = line.find("=");
+    if (n == std::string::npos)
+        throw Exception("Can not parse line: ", line);
+    std::string param(line.begin(), line.begin() + n);
+    rtrim(param);
+    std::string value(line.begin() + n + 1, line.end());
+    ltrim(value);
+    return {param, value};
+}
+
 void Config::readStream(std::istream& istream) {
     std::string line;
     
@@ -33,16 +61,11 @@ void Config::readStream(std::istream& istream) {
     while (std::getline(istream, line)) {
 
         line.erase(std::find(line.begin(), line.end(), ';'), line.end());
-
-        if(std::regex_match(line, emptyString))
+        trim(line);
+        if (line.empty())
             continue;
 
-        expr = Config::parseString(line);
-
-        assert(expr.size() >= 3);
-
-        name = expr[1];
-        value = expr[2];
+        auto [name, value] = getNameAndValue(line);
         if (std::regex_match(value, decimalInt)) {
             TEMap::insert<int>(name, std::stoi(value));
         }

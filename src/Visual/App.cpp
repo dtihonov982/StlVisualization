@@ -21,8 +21,9 @@ void App::createPlayers(uint64_t delayRatio, const std::vector<std::string_view>
     std::vector<SDL_Rect> blocks = getGrid(count, windowWidth_, windowHeight_);
     for (size_t i = 0; i < count; ++i) {
         try {
-            Player curr = Player::makePlayer(renderer_, blocks[i], delayRatio, files[i]);
-            players_.push_back(std::move(curr));
+            Record record = Record::load(files[i]);
+            players_.emplace_back(renderer_, blocks[i], 
+                delayRatio, std::move(record), config_);
         }
         catch (const Exception& ex) {
             std::cerr << "Error while creating player for " << files[i] << "\n";

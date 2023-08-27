@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include "Common/Common.h"
+#include "Common/Config.h"
 #include "Common/Exception.h"
 
 //return rectangles what fills area and represents [first; last) as a chart diagram
@@ -190,6 +191,7 @@ private:
     int h_;
     SDL_Color backgroundColor_     = {  0x00,   0x3f,   0x5c, 255};
     SDL_Color defaultElementColor_ = { 0xff, 0x63, 0x61, 255};
+    std::shared_ptr<Config> config_;
     float gapRate_ = 2.0f; //gapRate_ = gapWidth / elementWidth;
 };
 

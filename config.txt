@@ -1,3 +1,6 @@
 WindowWidth = 1600
 WindowHeight = 800
 BackgroundColor = 0x003f5cff
+PlayerLabelFontName = /usr/share/fonts/truetype/freefont/FreeMono.ttf
+PlayerLabelFontSize = 14
+PlayerLabelColor = 0x00ffffff

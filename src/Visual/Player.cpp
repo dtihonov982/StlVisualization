@@ -5,22 +5,20 @@
 
 using namespace std::chrono;
 
-Player Player::makePlayer(SDL_Renderer* renderer, const SDL_Rect& rect, uint64_t delayRatio, std::string_view filename) {
-    Record record = Record::load(filename);
-    return Player(renderer, rect, delayRatio, std::move(record));
-}
-
 Player::Player(SDL_Renderer* renderer,
                const SDL_Rect& area, 
                uint64_t delayRatio,
-               Record&& record)
+               Record&& record,
+               const std::shared_ptr<Config>& config)
 : renderer_(renderer)
 , delayRatio_(delayRatio)
 , data_(std::move(record.data))
 , script_(std::move(record.script)) 
 , label_(renderer_)
+, config_(config)
 {
     initLabel(record.info);
+    chartLabelSpace = config_->get<int>("PlayerLabelSpace", chartLabelSpace);
     arrangeElements(area);
     chart_.update(data_.begin(), data_.end());
 }
@@ -41,8 +39,15 @@ void Player::arrangeElements(const SDL_Rect& area) {
 
 void Player::initLabel(std::string_view title) {
     label_.setText(title);
-    label_.setFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 24);
-    label_.setColor({0xff, 0xff, 0xff, 0xff});
+
+    std::string fontName = config_->get<std::string>("PlayerLabelFontName", "/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    int fontSize = config_->get<int>("PlayerLabelFontSize", 24);
+    label_.setFont(fontName, fontSize);
+
+    Color fontColorRaw = config_->get<Color>("PlayerLabelColor", 0xffffffff);
+    SDL_Color fontColor = toSDLColor(fontColorRaw);
+    label_.setColor(fontColor);
+
     label_.update();
 }
 

@@ -12,6 +12,7 @@
 #include "Logger/Event.h"
 #include "Visual/Scheduler.h"
 #include "Visual/Label.h"
+#include "Common/Config.h"
 
 class Player: public IEventHandler {
 public:
@@ -19,12 +20,12 @@ public:
     Player(SDL_Renderer* renderer,
            const SDL_Rect& area, 
            uint64_t delayRatio,
-           Record&& record);
+           Record&& record,
+           const std::shared_ptr<Config>& config);
     void draw();
     void toggleStatus();
     Status getStatus() { return status_;  }
     void setStatus(Status status) { status_ = status; }
-    static Player makePlayer(SDL_Renderer* renderer, const SDL_Rect& rect, uint64_t delayRatio, std::string_view filename);
     void handle(Event& event) override;
     std::chrono::milliseconds getMsToNextAction() const;
 private:
@@ -36,7 +37,7 @@ private:
 
     SDL_Renderer* renderer_;
     Label label_;
-    static constexpr int chartLabelSpace = 20;
+    int chartLabelSpace = 20;
 
     uint64_t delayRatio_;
     std::vector<int> data_;
@@ -46,5 +47,6 @@ private:
     Chart chart_;
     //Runs paused. Starts with Space.
     Status status_ = Pause;
+    std::shared_ptr<Config> config_;
 };
 #endif // PLAYER_H
