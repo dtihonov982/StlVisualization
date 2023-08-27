@@ -5,6 +5,7 @@
 #include <string>
 #include <stack>
 #include <cstdint>
+#include <string_view>
 
 #include "Visual/Chart.h"
 #include "Common/Script.h"
@@ -18,9 +19,7 @@ public:
     Player(SDL_Renderer* renderer,
            const SDL_Rect& area, 
            uint64_t delayRatio,
-           const std::string& title, 
-           const std::vector<int>& data, 
-           const Script& script);
+           Record&& record);
     void draw();
     void toggleStatus();
     Status getStatus() { return status_;  }
@@ -31,16 +30,15 @@ public:
 private:
     void handleAction(const Action& action);
 
-    void initLabel();
+    void initLabel(std::string_view title);
     void arrangeElements(const SDL_Rect& area);
+    void dropMarkedElements();
 
     SDL_Renderer* renderer_;
     Label label_;
     static constexpr int chartLabelSpace = 20;
 
     uint64_t delayRatio_;
-    void dropMarkedElements();
-    std::string title_;
     std::vector<int> data_;
     std::stack<int> markedPos_;
     Script script_;

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <utility>
 #include "Common/Exception.h"
 #include "Visual/Player.h"
 
@@ -6,23 +7,20 @@ using namespace std::chrono;
 
 Player Player::makePlayer(SDL_Renderer* renderer, const SDL_Rect& rect, uint64_t delayRatio, std::string_view filename) {
     Record record = Record::load(filename);
-    return Player(renderer, rect, delayRatio, record.info, record.data, record.script);
+    return Player(renderer, rect, delayRatio, std::move(record));
 }
 
 Player::Player(SDL_Renderer* renderer,
                const SDL_Rect& area, 
                uint64_t delayRatio,
-               const std::string& title, 
-               const std::vector<int>& data, 
-               const Script& script)
+               Record&& record)
 : renderer_(renderer)
 , delayRatio_(delayRatio)
-, title_(title)
-, data_(data)
-, script_(script) 
+, data_(std::move(record.data))
+, script_(std::move(record.script)) 
 , label_(renderer_)
 {
-    initLabel();
+    initLabel(record.info);
     arrangeElements(area);
     chart_.update(data_.begin(), data_.end());
 }
@@ -41,8 +39,8 @@ void Player::arrangeElements(const SDL_Rect& area) {
     chart_.setGeometry(chartArea);
 }
 
-void Player::initLabel() {
-    label_.setText(title_);
+void Player::initLabel(std::string_view title) {
+    label_.setText(title);
     label_.setFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 24);
     label_.setColor({0xff, 0xff, 0xff, 0xff});
     label_.update();
