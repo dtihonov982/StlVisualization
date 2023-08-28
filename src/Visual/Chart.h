@@ -12,103 +12,28 @@
 #include "Common/Common.h"
 #include "Common/Config.h"
 #include "Common/Exception.h"
+#include "Visual/Rectangle.h"
 
-//return rectangles what fills area and represents [first; last) as a chart diagram
-//TODO: Does it need maxSize? It will be change?
-template<typename It>
-std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int maxSize, int maxValue) {
-    int size = last - first;
-    assert(size <= maxSize);
-    std::vector<SDL_Rect> result;
-    if (size == 0)
-        return result;
-    if (size == 1)
-        return result;
-    if (maxSize > area.w)
-        return result; //to many data to visualize in area
-
-    //use float not integer to avoid from rounding routine in emplace logic
-    float rectWidth = area.w / (maxSize + (maxSize - 1) * gapRate);     
-    float gapWidth;
-    if (rectWidth >= 1.0f) {
-        gapWidth  = gapRate * rectWidth;
-    }
-    //If too many data for gape rate, change gape rate
-    else {
-        rectWidth = 1.0f;
-        gapWidth = static_cast<float>(area.w - maxSize) / (maxSize - 1);
-    }
-
-    //SDL requires coordinates for top left corner of each rectangle
-    //for computations use down left coordinates (base)
-    float baseX = area.x;
-    float baseY = area.y + area.h;
-
-    while (first < last) {
-        int currValue = *first;
-        assert(currValue <= maxValue);
-        SDL_Rect currRect;
-        if (currValue != 0) {
-            float currH = currValue * area.h / maxValue;
-            //after evaluations coordinates transfers from base to top-left
-            currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
-        }
-        else {
-            currRect = roundRect(baseX, baseY, rectWidth, 0.0f);
-        }
-        result.push_back(currRect);
-
-        baseX += gapWidth + rectWidth;
-        ++first;
-    }
-
-    return result;
-}
-
-//TODO: draw method for element
-//TODO: SDL_Rect instead x, y, ...
-//TODO: set geometry after update
 //draw chart from vector values
+// The Chart represents a diapason [first, last) as a set of rectangles with different heights. 
 class Chart {
 public:
     Chart(const std::shared_ptr<Config>& config): config_(config) {
         Color backgroundColorRaw = config_->get<Color>("BackgroundColor", 0x00000000);
-        backgroundColor_ = toSDLColor(backgroundColorRaw);
+        background_.color = toSDLColor(backgroundColorRaw);
         Color defaultElementColorRaw = config_->get<Color>("ElementsColor", 0xffffffff);
         defaultElementColor_ = toSDLColor(defaultElementColorRaw);
     }
 
     //rect - area of the chart on screen. [begin; end) - data to show in chart
     void setGeometry(const SDL_Rect& rect) {
-        x_ = rect.x; 
-        y_ = rect.y; 
-        w_ = rect.w; 
-        h_ = rect.h;
+        background_.geom = rect;
     }
 
     void draw(SDL_Renderer* renderer) {
-        SDL_SetRenderDrawColor(
-            renderer,
-            backgroundColor_.r, 
-            backgroundColor_.g,
-            backgroundColor_.b,
-            backgroundColor_.a
-        );
-        SDL_Rect chartArea {x_, y_, w_, h_};
-
-        SDL_RenderFillRect(renderer, &chartArea);
-
+        ::draw(renderer, background_);
         for (auto& element: elements_) {
-            SDL_SetRenderDrawColor(
-                renderer,
-                element.color_.r, 
-                element.color_.g,
-                element.color_.b,
-                element.color_.a
-            );
-
-            SDL_Rect current {element.x_, element.y_, element.w_, element.h_};
-            SDL_RenderFillRect(renderer, &current);
+            ::draw(renderer, element);
         }
     }
 
@@ -119,25 +44,24 @@ public:
         if (end - begin <= 0)
             return;
 
-        SDL_Rect area{x_, y_, w_, h_};
         int max = *std::max_element(begin, end);
-        auto rectangles = emplace(area, begin, end, gapRate_, end - begin, max);
+        auto rectangles = emplace(background_.geom, begin, end, gapRate_, max);
 
         for (auto& rect: rectangles) {
-            elements_.emplace_back(rect.x, rect.y, rect.w, rect.h, defaultElementColor_);
+            elements_.push_back({rect, defaultElementColor_});
         }
     }
 
     void setElementColor(size_t pos, const SDL_Color& color) {
         if (pos < elements_.size())
-            elements_[pos].color_ = color;
+            elements_[pos].color = color;
         else 
             throw Exception("Invalid chart element position ", pos, ".There is ", elements_.size(), " elements in chart.");
     }
 
     void resetElementColor(size_t pos) {
         if (pos < elements_.size())
-            elements_[pos].color_ = defaultElementColor_;
+            elements_[pos].color = defaultElementColor_;
         else 
             throw Exception("Invalid chart element position ", pos, ".There is ", elements_.size(), " elements in chart.");
     }
@@ -147,30 +71,63 @@ public:
     }
 
     void setBackgroundColor(const SDL_Color& color) {
-        backgroundColor_ = color;
+        background_.color = color;
     }
 
-    struct Element {
-        Element(float x, float y, float w, float h, const SDL_Color& color):
-        x_(static_cast<int>(x)),
-        y_(static_cast<int>(y)),
-        w_(static_cast<int>(w)),
-        h_(static_cast<int>(h)),
-        color_(color) {}
-        
-        int x_;
-        int y_;
-        int w_;
-        int h_;
-        SDL_Color color_;
-    };
 private:
-    std::vector<Element> elements_;
-    int x_;
-    int y_;
-    int w_;
-    int h_;
-    SDL_Color backgroundColor_     = {  0x00,   0x3f,   0x5c, 255};
+    //return rectangles what fills area and represents [first; last) as a chart diagram
+    //TODO: Does it need maxSize? It will be change?
+    template<typename It>
+        std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, int maxValue) {
+            int size = last - first;
+            assert(size <= size);
+            std::vector<SDL_Rect> result;
+            if (size == 0)
+                return result;
+            if (size == 1)
+                return result;
+            if (size > area.w)
+                return result; //to many data to visualize in area
+
+            //use float not integer to avoid from rounding routine in emplace logic
+            float rectWidth = area.w / (size + (size - 1) * gapRate);     
+            float gapWidth;
+            if (rectWidth >= 1.0f) {
+                gapWidth  = gapRate * rectWidth;
+            }
+            //If too many data for gape rate, change gape rate
+            else {
+                rectWidth = 1.0f;
+                gapWidth = static_cast<float>(area.w - size) / (size - 1);
+            }
+
+            //SDL requires coordinates for top left corner of each rectangle
+            //for computations use down left coordinates (base)
+            float baseX = area.x;
+            float baseY = area.y + area.h;
+
+            while (first < last) {
+                int currValue = *first;
+                assert(currValue <= maxValue);
+                SDL_Rect currRect;
+                if (currValue != 0) {
+                    float currH = currValue * area.h / maxValue;
+                    //after evaluations coordinates transfers from base to top-left
+                    currRect = roundRect(baseX, baseY - currH, rectWidth, currH);
+                }
+                else {
+                    currRect = roundRect(baseX, baseY, rectWidth, 0.0f);
+                }
+                result.push_back(currRect);
+
+                baseX += gapWidth + rectWidth;
+                ++first;
+            }
+
+            return result;
+        }
+    std::vector<Rectangle> elements_;
+    Rectangle background_{0, 0, 0, 0, {  0x00,   0x3f,   0x5c, 255}};
     SDL_Color defaultElementColor_ = { 0xff, 0x63, 0x61, 255};
     std::shared_ptr<Config> config_;
     float gapRate_ = 2.0f; //gapRate_ = gapWidth / elementWidth;

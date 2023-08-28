@@ -1,7 +1,7 @@
 #ifndef MYALGORITHM_H
 #define MYALGORITHM_H
 
-//Simple algorithms for debug recording
+//Simple algorithms for debug a record
 
 namespace my {
 
