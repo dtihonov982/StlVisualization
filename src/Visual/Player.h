@@ -48,5 +48,6 @@ private:
     //Runs paused. Starts with Space.
     Status status_ = Pause;
     std::shared_ptr<Config> config_;
+    SDL_Color accessColor_;
 };
 #endif // PLAYER_H

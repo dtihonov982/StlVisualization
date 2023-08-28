@@ -16,9 +16,12 @@ Player::Player(SDL_Renderer* renderer,
 , script_(std::move(record.script)) 
 , label_(renderer_)
 , config_(config)
+, chart_(config)
 {
     initLabel(record.info);
     chartLabelSpace = config_->get<int>("PlayerLabelSpace", chartLabelSpace);
+    Color accessColorRaw = config_->get<Color>("AccessColor", 0xfff00fff);
+    accessColor_ = toSDLColor(accessColorRaw);
     arrangeElements(area);
     chart_.update(data_.begin(), data_.end());
 }
@@ -88,14 +91,14 @@ void Player::dropMarkedElements() {
 void Player::handleAction(const Action& action) {
     switch (action.type) {
     case Action::ACCESS:
-        chart_.setElementColor(action.pos, {255, 255, 255, 255});
+        chart_.setElementColor(action.pos, accessColor_);
         markedPos_.push(action.pos);
         break;
     case Action::WRITE:
         data_[action.pos] = action.value;
         chart_.update(data_.begin(), data_.end());
 
-        chart_.setElementColor(action.pos, {255, 255, 255, 255});
+        chart_.setElementColor(action.pos, accessColor_);
         markedPos_.push(action.pos);
         break;
     default:

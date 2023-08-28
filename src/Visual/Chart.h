@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <vector>
 #include <cassert>
+#include <memory>
+
 #include <SDL2/SDL.h>
 
 #include "Common/Common.h"
@@ -69,40 +71,19 @@ std::vector<SDL_Rect> emplace(SDL_Rect area, It first, It last, float gapRate, i
 //draw chart from vector values
 class Chart {
 public:
-    Chart() {}
-    //rect - area of the chart on screen. [begin; end) - data to show in chart
-    template <typename It>
-    Chart(const SDL_Rect& rect, It begin, It end)
-    : x_(rect.x), y_(rect.y), w_(rect.w), h_(rect.h)
-    {   
-        update(begin, end);
+    Chart(const std::shared_ptr<Config>& config): config_(config) {
+        Color backgroundColorRaw = config_->get<Color>("BackgroundColor", 0x00000000);
+        backgroundColor_ = toSDLColor(backgroundColorRaw);
+        Color defaultElementColorRaw = config_->get<Color>("ElementsColor", 0xffffffff);
+        defaultElementColor_ = toSDLColor(defaultElementColorRaw);
     }
 
+    //rect - area of the chart on screen. [begin; end) - data to show in chart
     void setGeometry(const SDL_Rect& rect) {
         x_ = rect.x; 
         y_ = rect.y; 
         w_ = rect.w; 
         h_ = rect.h;
-    }
-
-    void dump() {
-        std::cout << "x: " << x_ << '\n';
-        std::cout << "y: " << y_ << '\n';
-        std::cout << "w: " << w_ << '\n';
-        std::cout << "h: " << h_ << '\n';
-        std::cout << "gap rate: " << gapRate_ << '\n';
-
-        for (auto& element: elements_) {
-            std::cout << "(x: " << element.x_ << ", y: ";
-            std::cout << element.y_  << ", w: ";
-            std::cout << element.w_  << ", h: ";
-            std::cout << element.h_ << ")\n";
-        }
-
-        if (!elements_.empty()){
-            auto last = elements_.back();
-            std::cout << "bound: " << last.x_ + last.w_ << '\n';
-        }
     }
 
     void draw(SDL_Renderer* renderer) {
