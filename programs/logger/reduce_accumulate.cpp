@@ -13,7 +13,7 @@ TEST(std_algorithm, reduce_accumulate) {
 
     try {
         RecordingSet<decltype(data)> set;
-        auto [f1, l1] = set.add("reduce", data);
+        auto [f1, l1] = set.add("reduce", "std::reduce", data);
         set.runStopwatch();
         auto result = std::reduce(f1, l1);
         set.save();
@@ -24,7 +24,7 @@ TEST(std_algorithm, reduce_accumulate) {
     }
     try {
         RecordingSet<decltype(data)> set;
-        auto [f1, l1] = set.add("accumulate", data);
+        auto [f1, l1] = set.add("accumulate", "std::accumulate", data);
         set.runStopwatch();
         auto result = std::accumulate(f1, l1, 0);
         set.save();

@@ -19,8 +19,8 @@ TEST(std_algorithm, is_permutation) {
 
     try {
         RecordingSet<decltype(first)> set;
-        auto [f1, l1] = set.add("is_permutation_first", first);
-        auto [f2, l2] = set.add("is_permutation_second", second);
+        auto [f1, l1] = set.add("is_permutation_first", "std::permutation first", first);
+        auto [f2, l2] = set.add("is_permutation_second", "std::permutation second", second);
         set.runStopwatch();
         std::is_permutation(f1, l1, f2);
         set.save();

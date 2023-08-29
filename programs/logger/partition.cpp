@@ -18,7 +18,7 @@ TEST(std_algorithm, partition) {
 
     try {
         RecordingSet<decltype(data)> set;
-        auto [f1, l1] = set.add("partition", data);
+        auto [f1, l1] = set.add("partition", "std::partition P(x) = x == value", data);
         set.runStopwatch();
         std::partition(f1, l1, [partitionValue] (int x) { return x == partitionValue; });
         set.save();

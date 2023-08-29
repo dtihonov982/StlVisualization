@@ -16,9 +16,9 @@ TEST(std_algorithm, merge) {
 
     try {
         RecordingSet<decltype(a)> set;
-        auto [f1, l1] = set.add("merge_first", a);
-        auto [f2, l2] = set.add("merge_second", b);
-        auto [f3, l3] = set.add("merge_result", result);
+        auto [f1, l1] = set.add("merge_first", "std::merge first", a);
+        auto [f2, l2] = set.add("merge_second", "std::merge second", b);
+        auto [f3, l3] = set.add("merge_result", "std::merge result", result);
         set.runStopwatch();
         std::merge(f1, l1, f2, l2, f3);
         set.save();
