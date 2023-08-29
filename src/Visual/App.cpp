@@ -57,9 +57,10 @@ void App::initGraphics() {
     window_ = SDL_CreateWindow("Title", 
                     SDL_WINDOWPOS_CENTERED, 
                     SDL_WINDOWPOS_CENTERED, 
-                    windowWidth_, windowHeight_, 0);
+                    windowWidth_, windowHeight_, SDL_WINDOW_FULLSCREEN);
     if (!window_)
         throw Exception("Window creating error.");
+    //SDL_SetWindowBordered(window_, SDL_FALSE);
 
     renderer_ = SDL_CreateRenderer(window_, -1, 0);
     if (!renderer_)

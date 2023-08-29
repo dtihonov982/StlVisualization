@@ -1,5 +1,5 @@
-WindowWidth = 1600
-WindowHeight = 800
+WindowWidth = 1920
+WindowHeight = 1080
 
 PlayerLabelFontName = /usr/share/fonts/truetype/freefont/FreeSans.ttf
 PlayerLabelFontSize = 32
