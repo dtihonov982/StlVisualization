@@ -12,6 +12,8 @@ set (SRCS reduce_accumulate.cpp
           partition.cpp
           merge.cpp
           transform_numeric.cpp
+          up_low_bound.cpp
+          heap.cpp
 )
 add_executable(logger ${SRCS})
 target_link_libraries(logger PRIVATE Logger GTest::GTest GTest::Main)
