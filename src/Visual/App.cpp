@@ -6,7 +6,7 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 
-App::App(uint64_t delayRatio, const std::vector<std::string_view>& files, const Config& config)
+App::App(float delayRatio, const std::vector<std::string_view>& files, const Config& config)
 : config_(std::make_shared<Config>(config)) {
     windowWidth_ = config_->get<int>("WindowWidth", 1024);
     windowHeight_ = config_->get<int>("WindowHeight", 640);
@@ -16,7 +16,7 @@ App::App(uint64_t delayRatio, const std::vector<std::string_view>& files, const 
     createPlayers(delayRatio, files);
 }
 
-void App::createPlayers(uint64_t delayRatio, const std::vector<std::string_view>& files) {
+void App::createPlayers(float delayRatio, const std::vector<std::string_view>& files) {
     size_t count = files.size();
     std::vector<SDL_Rect> blocks = getGrid(count, windowWidth_, windowHeight_);
     for (size_t i = 0; i < count; ++i) {

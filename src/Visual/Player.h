@@ -19,7 +19,7 @@ public:
     enum Status { Play, Pause, Done };
     Player(SDL_Renderer* renderer,
            const SDL_Rect& area, 
-           uint64_t delayRatio,
+           float delayRatio,
            Record&& record,
            const std::shared_ptr<Config>& config);
     void draw();
@@ -39,7 +39,7 @@ private:
     Label label_;
     int chartLabelSpace = 20;
 
-    uint64_t delayRatio_;
+    float delayRatio_;
     std::vector<int> data_;
     std::stack<int> markedPos_;
     Script script_;

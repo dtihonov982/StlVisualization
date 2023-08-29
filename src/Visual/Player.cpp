@@ -7,7 +7,7 @@ using namespace std::chrono;
 
 Player::Player(SDL_Renderer* renderer,
                const SDL_Rect& area, 
-               uint64_t delayRatio,
+               float delayRatio,
                Record&& record,
                const std::shared_ptr<Config>& config)
 : renderer_(renderer)
@@ -114,7 +114,7 @@ std::chrono::milliseconds Player::getMsToNextAction() const {
         const Action& prev = script_[currScriptPos_ - 1];
         rawDelay -= prev.timePoint;
     }
-    return milliseconds(rawDelay / delayRatio_);
+    return milliseconds(static_cast<int>(rawDelay / delayRatio_));
 }
 
 void Player::toggleStatus() {

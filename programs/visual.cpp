@@ -11,9 +11,9 @@ int main(int argc, char** argv) {
         std::cout << "Usage: visual delay_ratio file1 file2 ... fileN\n";
         return 1;
     }
-    int delayRatio = 100;
+    float delayRatio = 100.0f;
     try {
-        delayRatio = std::stoi(argv[1]);
+        delayRatio = std::stof(argv[1]);
     }
     catch (const std::invalid_argument& ex) {
         std::cerr << "Incorrect delay ratio: " << argv[1] << "\n";

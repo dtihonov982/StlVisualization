@@ -19,7 +19,7 @@ using PlayerScheduler = Scheduler<size_t>;
 
 class App: public IEventHandler {
 public:
-    App(uint64_t delayRatio, const std::vector<std::string_view>& files, const Config& config);
+    App(float delayRatio, const std::vector<std::string_view>& files, const Config& config);
     ~App();
     void run();
     void handleEvents();
@@ -28,7 +28,7 @@ public:
     bool isRunning() { return isRunning_; }
     void initScheduler();
     void initGraphics();
-    void createPlayers(uint64_t delayRatio, const std::vector<std::string_view>& files);
+    void createPlayers(float delayRatio, const std::vector<std::string_view>& files);
     void handle(Event& event) override;
 private:
     Scheduler<IEventHandlerPtr> sched_;
