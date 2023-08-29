@@ -1,16 +1,11 @@
 #ifndef STOPWATCH_H
 #define STOPWATCH_H
 
-#include <chrono>
-#include <cassert>
 #include <cstdint>
 #include <mutex>
 
 class Stopwatch {
 public:
-    using clock = std::chrono::steady_clock;
-    using time_point = std::chrono::time_point<clock>;
-
     Stopwatch() { start(); }
     void start();
     void pause();
@@ -21,9 +16,11 @@ public:
     void unlock() { resume(); }
     uint64_t elapsedNanoseconds() const;
 private:
+    using time_point = long;
+    using duration = long;
     // Then stopwatch is idle this value grows.
     // Idle doesn't affect on duration.
-    std::chrono::nanoseconds idle_;
+    duration idle_;
     time_point start_;
     // A moment when was last pause. It is valid only in pause state.
     time_point pausePoint_;
