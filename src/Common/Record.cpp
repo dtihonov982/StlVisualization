@@ -1,10 +1,23 @@
-#include "Script.h"
+#include "Record.h"
 #include <cassert>
 #include <sstream>
 #include <string>
 #include <fstream>
 
 #include "Common/Exception.h"
+#include "Common/Common.h"
+
+size_t tryToReadSizeT(std::string_view str);
+std::vector<std::string> split(std::string_view input, char delim);
+std::vector<int> loadDataFromDump(const std::string& dump, char delim);
+std::vector<Action> readScript(std::istream& is, char delim);
+
+template<typename... Args>
+std::string concate(Args&&... args) {
+    std::ostringstream oss;
+    (oss << ... << args);
+    return oss.str();
+}
 
 std::string Action::toString() const {
     std::ostringstream oss;
@@ -99,6 +112,17 @@ std::vector<int> loadDataFromDump(const std::string& dump, char delim) {
     return result;
 }
 
+void Record::save(const std::string& path) {
+    std::ofstream file(path);
+    if (!file)
+        throw Exception("Can't open file ", path);
+    file << info << "\n";
+    file << data << "\n";
+    for (const auto& action: script) {
+        file << action.toString() << "\n";
+    }
+}
+
 Record Record::load(std::string_view filename) {
     std::ifstream file{filename.data()};
     if (!file)
@@ -112,4 +136,3 @@ Record Record::load(std::string_view filename) {
     return rec;
 }
         
-

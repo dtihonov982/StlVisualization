@@ -11,7 +11,7 @@
 #include "Common/Exception.h"
 #include "Visual/Chart.h"
 #include "Visual/Scheduler.h"
-#include "Common/Script.h"
+#include "Common/Record.h"
 #include "Logger/Event.h"
 #include "Common/Config.h"
 

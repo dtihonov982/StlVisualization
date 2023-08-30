@@ -1,4 +1,4 @@
-#include "Common/Script.h"
+#include "Common/Record.h"
 
 int main(int argc, char** argv) {
     if (argc < 2)

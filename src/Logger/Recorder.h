@@ -26,9 +26,8 @@ public:
 
     Recorder(const std::string& name, const Container& data)
     : data_(std::make_shared<Container>(data))
-    , dataOriginal_(data)
+    , record_(name, data)
     , name_(name)
-    , info_(name)
     , interpreter_(data_) {
     }
 
@@ -37,9 +36,8 @@ public:
              const Container& data, 
              const std::shared_ptr<Stopwatch>& stopwatch_)
     : data_(std::make_shared<Container>(data))
-    , dataOriginal_(data)
+    , record_(name, data)
     , name_(name)
-    , info_(name)
     , interpreter_(data_, stopwatch_) {
     }
 
@@ -48,9 +46,8 @@ public:
              const Container& data, 
              const std::shared_ptr<Stopwatch>& stopwatch_)
     : data_(std::make_shared<Container>(data))
-    , dataOriginal_(data)
+    , record_(info, data)
     , name_(name)
-    , info_(info)
     , interpreter_(data_, stopwatch_) {
     }
 
@@ -64,14 +61,8 @@ public:
 
     void save() {
         auto path = getPathForSaving(name_);
-        std::ofstream file(path);
-        if (!file)
-            throw Exception("Can't open file ", path);
-        file << info_ << "\n";
-        file << dataOriginal_ << "\n";
-        for (const auto& action: interpreter_.getScript()) {
-            file << action.toString() << "\n";
-        }
+        record_.script = interpreter_.getScript();
+        record_.save(path);
     }
 
     static std::string getPathForSaving(std::string_view algoName) {
@@ -86,9 +77,8 @@ public:
 
 private:
     std::shared_ptr<Container> data_;
-    const Container dataOriginal_;
+    Record record_;
     std::string name_;
-    std::string info_;
     EventInterpreter<Container> interpreter_;
 };
 

@@ -8,7 +8,7 @@
 #include <string_view>
 
 #include "Visual/Chart.h"
-#include "Common/Script.h"
+#include "Common/Record.h"
 #include "Logger/Event.h"
 #include "Visual/Scheduler.h"
 #include "Visual/Label.h"

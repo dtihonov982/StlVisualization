@@ -11,7 +11,7 @@
 
 #include "Logger/Event.h"
 #include "Common/Exception.h"
-#include "Common/Script.h"
+#include "Common/Record.h"
 #include "Logger/Stopwatch.h"
 
 // EventInterpreter gets from NotifyingIterator an events and interpreters those events as an access and a changes of data.
