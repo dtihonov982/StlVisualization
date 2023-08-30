@@ -16,6 +16,22 @@ App::App(float delayRatio, const std::vector<std::string_view>& files, const Con
     createPlayers(delayRatio, files);
 }
 
+std::vector<SDL_Rect> getGrid(int cellsCount, int totalWidth, int totalHeight, float cellRatio = 0.90) {
+    std::vector<SDL_Rect> blocks;
+    int blockWidth = totalWidth * cellRatio;
+    int gap = (totalWidth - blockWidth) / 2;
+    int blockHeight = (totalHeight - gap * (cellsCount + 1)) / cellsCount;
+    for (int i = 0; i < cellsCount; ++i) {
+        SDL_Rect curr;
+        curr.x = gap;
+        curr.y = gap + i * (blockHeight + gap);
+        curr.w = blockWidth;
+        curr.h = blockHeight;
+        blocks.push_back(curr);
+    }
+    return blocks;
+}
+
 void App::createPlayers(float delayRatio, const std::vector<std::string_view>& files) {
     size_t count = files.size();
     std::vector<SDL_Rect> blocks = getGrid(count, windowWidth_, windowHeight_);
@@ -32,22 +48,6 @@ void App::createPlayers(float delayRatio, const std::vector<std::string_view>& f
     }
 }
     
-std::vector<SDL_Rect> getGrid(int cellsCount, int totalWidth, int totalHeight, float cellRatio) {
-    std::vector<SDL_Rect> blocks;
-    int blockWidth = totalWidth * cellRatio;
-    int gap = (totalWidth - blockWidth) / 2;
-    int blockHeight = (totalHeight - gap * (cellsCount + 1)) / cellsCount;
-    for (int i = 0; i < cellsCount; ++i) {
-        SDL_Rect curr;
-        curr.x = gap;
-        curr.y = gap + i * (blockHeight + gap);
-        curr.w = blockWidth;
-        curr.h = blockHeight;
-        blocks.push_back(curr);
-    }
-    return blocks;
-}
-
 void App::initGraphics() {
     TTF_Init();
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -75,15 +75,21 @@ void App::run() {
         IEventHandlerPtr handler = sched_.wait();
         WakeUp event{&sched_};
         handler->handle(event);
-        render();
+        draw();
     }
 }
 
 void App::handle(Event& event) {
     if (event.getType() != Event::WakeUp) 
         return;
+    SDL_Event sdlEvent;
+    while (SDL_PollEvent(&sdlEvent)) {
+        switch (sdlEvent.type) {
+            case SDL_QUIT: isRunning_ = false; return;
+            case SDL_KEYDOWN: handleKeyDown(sdlEvent); break;
+        }
+    }
     WakeUp& e = static_cast<WakeUp&>(event);
-    handleEvents();
     e.sched->add(40ms, this);
 }
 
@@ -92,16 +98,6 @@ void App::initScheduler() {
         sched_.add(player.getMsToNextAction(), &player);
     // TODO: ups as class member
     sched_.add(40ms, this);
-}
-
-void App::handleEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-            case SDL_QUIT: isRunning_ = false; break;
-            case SDL_KEYDOWN: handleKeyDown(event); break;
-        }
-    }
 }
 
 void App::handleKeyDown(SDL_Event& event) {
@@ -116,7 +112,7 @@ void App::handleKeyDown(SDL_Event& event) {
     }
 }
 
-void App::render() {
+void App::draw() {
     SDL_SetRenderDrawColor(renderer_, 
         backgroundColor_.r, backgroundColor_.g, 
         backgroundColor_.b, backgroundColor_.a);
