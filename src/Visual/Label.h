@@ -1,10 +1,11 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <string_view>
 #include <memory>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "Common/Exception.h"
 
