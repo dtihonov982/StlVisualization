@@ -21,3 +21,11 @@ add_executable(playlist playlist.cpp)
 target_link_libraries(playlist PRIVATE Common Visual)
 target_include_directories(playlist PUBLIC "${PROJECT_SOURCE_DIR}/src")
 
+add_executable(series series.cpp)
+target_link_libraries(series PRIVATE SDL2_ttf::SDL2_ttf SDL2::SDL2 Visual)
+target_include_directories(series PUBLIC "${PROJECT_SOURCE_DIR}/src")
+
+add_executable(ColoredSeries ColoredSeries.cpp)
+target_link_libraries(ColoredSeries PRIVATE SDL2_ttf::SDL2_ttf SDL2::SDL2 Visual)
+target_include_directories(ColoredSeries PUBLIC "${PROJECT_SOURCE_DIR}/src")
+

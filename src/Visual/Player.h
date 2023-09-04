@@ -16,18 +16,20 @@
 
 class Player: public IEventHandler {
 public:
-    enum Status { Play, Pause, Done };
     Player(SDL_Renderer* renderer,
            const SDL_Rect& area, 
            float delayRatio,
            Record&& record,
            const std::shared_ptr<Config>& config);
     void draw();
+
+    enum Status { Play, Pause, Done };
     void toggleStatus();
     Status getStatus() { return status_;  }
     void setStatus(Status status) { status_ = status; }
-    void handle(Event& event) override;
+
     std::chrono::milliseconds getMsToNextAction() const;
+    void handle(Event& event) override;
 private:
     void handleAction(const Action& action);
 
