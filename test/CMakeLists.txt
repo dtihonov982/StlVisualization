@@ -16,3 +16,8 @@ target_link_libraries(label PRIVATE SDL2_ttf::SDL2_ttf)
 target_link_libraries(label PRIVATE SDL2::SDL2)
 target_link_libraries(label PRIVATE Visual)
 target_include_directories(label PUBLIC "${PROJECT_SOURCE_DIR}/src")
+
+add_executable(playlist playlist.cpp)
+target_link_libraries(playlist PRIVATE Common Visual)
+target_include_directories(playlist PUBLIC "${PROJECT_SOURCE_DIR}/src")
+
