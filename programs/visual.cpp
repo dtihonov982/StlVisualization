@@ -25,8 +25,11 @@ int main(int argc, char** argv) {
     Config config{"config.txt"};
 
     try {
-        App app(delayRatio, filenames, config);
-        app.run();
+        App app(config);
+        for (;;) {
+            app.createPlayers(delayRatio, filenames);
+            app.run();
+        }
     }
     catch (const Exception& ex) {
         std::cerr << ex.what() << "\n";

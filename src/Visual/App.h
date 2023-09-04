@@ -19,13 +19,13 @@
 
 class App: public IEventHandler {
 public:
-    App(float delayRatio, const std::vector<std::string_view>& files, const Config& config);
+    App(const Config& config);
     ~App();
     void run();
+    void createPlayers(float delayRatio, const std::vector<std::string_view>& files);
 private:
     void initScheduler();
     void initGraphics();
-    void createPlayers(float delayRatio, const std::vector<std::string_view>& files);
 
     // On each event the App checks if a key was press.
     void handle(Event& event) override;

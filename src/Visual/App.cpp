@@ -6,14 +6,13 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 
-App::App(float delayRatio, const std::vector<std::string_view>& files, const Config& config)
+App::App(const Config& config)
 : config_(std::make_shared<Config>(config)) {
     windowWidth_ = config_->get<int>("WindowWidth", 1024);
     windowHeight_ = config_->get<int>("WindowHeight", 640);
     Color backgroundColorRaw = config_->get<Color>("BackgroundColor", 0x00000000);
     backgroundColor_ = toSDLColor(backgroundColorRaw);
     initGraphics();
-    createPlayers(delayRatio, files);
 }
 
 std::vector<SDL_Rect> getGrid(int cellsCount, int totalWidth, int totalHeight, float cellRatio = 0.90) {
@@ -33,6 +32,7 @@ std::vector<SDL_Rect> getGrid(int cellsCount, int totalWidth, int totalHeight, f
 }
 
 void App::createPlayers(float delayRatio, const std::vector<std::string_view>& files) {
+    players_.clear();
     size_t count = files.size();
     std::vector<SDL_Rect> blocks = getGrid(count, windowWidth_, windowHeight_);
     for (size_t i = 0; i < count; ++i) {
@@ -66,10 +66,10 @@ void App::initGraphics() {
     if (!renderer_)
         throw Exception("Renderer creating error.");
 
-    isRunning_ = true;
 }
 
 void App::run() {
+    isRunning_ = true;
     initScheduler();
     while (isRunning()) {
         IEventHandlerPtr handler = sched_.wait();
@@ -94,6 +94,7 @@ void App::handle(Event& event) {
 }
 
 void App::initScheduler() {
+    sched_.clearTasks();
     for (auto& player: players_)
         sched_.add(player.getMsToNextAction(), &player);
     // TODO: ups as class member

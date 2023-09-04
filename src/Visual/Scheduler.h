@@ -35,6 +35,7 @@ public:
     bool empty() {
         return units_.empty();
     }
+    void clearTasks() { units_.clear(); }
     Job wait() {
         if (!empty()) {
             Task curr = *units_.begin();
