@@ -19,10 +19,8 @@
 class Chart {
 public:
     Chart(const std::shared_ptr<Config>& config): config_(config) {
-        Color backgroundColorRaw = config_->get<Color>("BackgroundColor", 0x00000000);
-        background_.color = toSDLColor(backgroundColorRaw);
-        Color defaultElementColorRaw = config_->get<Color>("ElementsColor", 0xffffffff);
-        defaultElementColor_ = toSDLColor(defaultElementColorRaw);
+        background_.color = getSDLColorFromConfig(*config, "BackgroundColor", 0x00000000);
+        defaultElementColor_ = getSDLColorFromConfig(*config_, "ElementsColor", 0xffffffff);
     }
 
     //rect - area of the chart on screen. [begin; end) - data to show in chart

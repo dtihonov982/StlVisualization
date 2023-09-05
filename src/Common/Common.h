@@ -8,6 +8,7 @@
 #include <list>
 
 #include <SDL2/SDL.h> 
+#include "Config.h"
 
 std::vector<int> getRandVector(int size, int min, int max);
 
@@ -26,6 +27,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
 
 using Color = long long;
 SDL_Color toSDLColor(Color color) noexcept;
+SDL_Color getSDLColorFromConfig(const Config& config, const std::string& key, Color defaultColor);
 
 SDL_Rect roundRect(float x, float y, float w, float h);
 #endif // COMMON_H

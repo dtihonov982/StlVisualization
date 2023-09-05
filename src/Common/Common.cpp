@@ -30,3 +30,9 @@ SDL_Color toSDLColor(Color color) noexcept {
     res.a = color         & 0xff;
     return res;
 }
+
+SDL_Color getSDLColorFromConfig(const Config& config, const std::string& key, Color defaultColor) {
+
+    auto colorRaw = config.get<Color>(key, defaultColor);
+    return toSDLColor(colorRaw);
+}
