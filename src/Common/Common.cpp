@@ -1,8 +1,8 @@
-#include "Common.h"
-
 #include <random>
 #include <vector>
 #include <cmath>
+
+#include "Common.h"
 
 std::vector<int> getRandVector(int size, int min, int max) {
     std::random_device dev;

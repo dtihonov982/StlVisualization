@@ -1,10 +1,11 @@
-#include "Visual/App.h"
-#include "Common/Config.h"
 #include <string>
 #include <iostream>
 #include <string_view>
 #include <vector>
 #include <stdexcept>
+
+#include "Common/Config.h"
+#include "Visual/App.h"
 
 int main(int argc, char** argv) {
     if (argc < 3) {

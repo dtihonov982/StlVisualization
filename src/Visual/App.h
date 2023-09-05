@@ -9,13 +9,13 @@
 
 #include <SDL2/SDL.h>
 
-#include "Visual/Player.h"
+#include "Common/Config.h"
 #include "Common/Exception.h"
-#include "Visual/Chart.h"
-#include "Visual/Scheduler.h"
 #include "Common/Record.h"
 #include "Logger/Event.h"
-#include "Common/Config.h"
+#include "Visual/Chart.h"
+#include "Visual/Scheduler.h"
+#include "Visual/Player.h"
 
 class App: public IEventHandler {
 public:

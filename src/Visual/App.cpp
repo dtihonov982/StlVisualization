@@ -1,6 +1,7 @@
+#include <fstream>
+
 #include "App.h"
 #include "Common/Common.h"
-#include <fstream>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
