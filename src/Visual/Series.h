@@ -13,7 +13,7 @@
 class Series {
 public:
     
-    void setGeom(const SDL_Rect& geom) {
+    void setGeometry(const SDL_Rect& geom) {
         geom_ = geom;
     }
 
@@ -35,6 +35,9 @@ public:
         int max = *std::max_element(begin, end);
         elements_ = emplace(geom_, begin, end, gapRate_, max);
     }
+
+    size_t size() const { return elements_.size(); }
+
 
     //return rectangles what fills area and represents [first; last) as a chart diagram
     template<typename It>

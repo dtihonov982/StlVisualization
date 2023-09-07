@@ -9,6 +9,12 @@ public:
         std::fill(colors_.begin(), colors_.end(), defaultColor_);
     }
 
+    void setColorsToDefault(size_t pos) {
+        if (pos >= colors_.size()) 
+            throw Exception("Invalid position ", pos);
+        colors_[pos] = defaultColor_;
+    }
+
     template<typename It>
     void load(It begin, It end) {
         if (end < begin)
@@ -19,7 +25,7 @@ public:
     }
 
     void setElementColor(size_t pos, const SDL_Color& color) {
-        if (pos < 0 || pos >= colors_.size()) 
+        if (pos >= colors_.size()) 
             throw Exception("Invalid position ", pos);
         colors_[pos] = color;
     }
