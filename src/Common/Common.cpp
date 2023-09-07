@@ -1,8 +1,8 @@
-#include "Common.h"
-
 #include <random>
 #include <vector>
 #include <cmath>
+
+#include "Common.h"
 
 std::vector<int> getRandVector(int size, int min, int max) {
     std::random_device dev;
@@ -29,4 +29,10 @@ SDL_Color toSDLColor(Color color) noexcept {
     res.b = (color >> 8)  & 0xff;
     res.a = color         & 0xff;
     return res;
+}
+
+SDL_Color getSDLColorFromConfig(const Config& config, const std::string& key, Color defaultColor) {
+
+    auto colorRaw = config.get<Color>(key, defaultColor);
+    return toSDLColor(colorRaw);
 }

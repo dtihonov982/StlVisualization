@@ -20,8 +20,7 @@ Player::Player(SDL_Renderer* renderer,
 {
     initLabel(record.info);
     chartLabelSpace = config_->get<int>("PlayerLabelSpace", chartLabelSpace);
-    Color accessColorRaw = config_->get<Color>("AccessColor", 0xfff00fff);
-    accessColor_ = toSDLColor(accessColorRaw);
+    accessColor_ = getSDLColorFromConfig(*config, "AccessColor", 0xfff00fff);
     arrangeElements(area);
     chart_.update(data_.begin(), data_.end());
 }
@@ -46,9 +45,7 @@ void Player::initLabel(std::string_view title) {
     std::string fontName = config_->get<std::string>("PlayerLabelFontName", "/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     int fontSize = config_->get<int>("PlayerLabelFontSize", 24);
     label_.setFont(fontName, fontSize);
-
-    Color fontColorRaw = config_->get<Color>("PlayerLabelColor", 0xffffffff);
-    SDL_Color fontColor = toSDLColor(fontColorRaw);
+    SDL_Color fontColor = getSDLColorFromConfig(*config_, "PlayerLabelColor", 0xffffffff);
     label_.setColor(fontColor);
 
     label_.update();

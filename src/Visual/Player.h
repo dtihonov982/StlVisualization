@@ -7,12 +7,12 @@
 #include <cstdint>
 #include <string_view>
 
-#include "Visual/Chart.h"
 #include "Common/Record.h"
+#include "Common/Config.h"
 #include "Logger/Event.h"
 #include "Visual/Scheduler.h"
+#include "Visual/Chart.h"
 #include "Visual/Label.h"
-#include "Common/Config.h"
 
 class Player: public IEventHandler {
 public:

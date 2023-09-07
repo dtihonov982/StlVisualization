@@ -9,10 +9,10 @@
 #include <cstdint>
 #include <mutex>
 
-#include "Logger/Event.h"
 #include "Common/Exception.h"
 #include "Common/Record.h"
 #include "Logger/Stopwatch.h"
+#include "Logger/Event.h"
 
 // EventInterpreter gets from NotifyingIterator an events and interpreters those events as an access and a changes of data.
 template<typename Container>

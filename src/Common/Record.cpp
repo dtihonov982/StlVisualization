@@ -1,11 +1,11 @@
-#include "Record.h"
 #include <cassert>
 #include <sstream>
 #include <string>
 #include <fstream>
 
-#include "Common/Exception.h"
-#include "Common/Common.h"
+#include "Exception.h"
+#include "Common.h"
+#include "Record.h"
 
 size_t tryToReadSizeT(std::string_view str);
 std::vector<std::string> split(std::string_view input, char delim);

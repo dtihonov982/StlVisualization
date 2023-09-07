@@ -6,9 +6,10 @@
 #include <iostream>
 #include <cassert>
 #include <string>
-#include "TEMap.h"
 #include <filesystem>
 #include <istream>
+
+#include "TEMap.h"
 
 class Config: public TEMap {
 public:
