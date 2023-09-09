@@ -44,6 +44,16 @@ public:
             rec.save();
     }
 
+    void pause() {
+        for (auto& [name, rec]: recorders_) 
+            rec.pause();
+    }
+
+    void resume() {
+        for (auto& [name, rec]: recorders_) 
+            rec.resume();
+    }
+
 private:
     std::unordered_map<std::string, Recorder<Container>> recorders_;
     std::shared_ptr<Stopwatch> synchTime_ = std::make_shared<Stopwatch>();

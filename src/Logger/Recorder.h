@@ -65,6 +65,9 @@ public:
         record_.save(path);
     }
 
+    void pause() { interpreter_.pauseRecording(); }
+    void resume() { interpreter_.resumeRecording(); }
+
     static std::string getPathForSaving(std::string_view algoName) {
         fs::path logs{"logs"};
         fs::create_directory(logs);

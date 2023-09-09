@@ -41,6 +41,8 @@ public:
     void handle(Event& event) override {
         if (event.getType() != Event::Access)
             return;
+        if (recordingIsPaused_ )
+            return;
 
         // The time of interpretation of events must not interact to information about writing and access time.
         pause_guard pause(*stopwatch_);
@@ -59,6 +61,9 @@ public:
         checkWriting();
         return script_;
     }
+
+    void pauseRecording() { recordingIsPaused_ = true; }
+    void resumeRecording() { recordingIsPaused_ = false; }
 
 private:
     using value_type = typename Container::value_type;
@@ -91,6 +96,7 @@ private:
         }
     }
 
+    bool recordingIsPaused_ = false;
     Script script_;
     Container copy_;
     std::shared_ptr<Container> original_;

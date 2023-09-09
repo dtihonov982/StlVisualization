@@ -29,3 +29,7 @@ add_executable(ColoredSeries ColoredSeries.cpp)
 target_link_libraries(ColoredSeries PRIVATE SDL2_ttf::SDL2_ttf SDL2::SDL2 Visual)
 target_include_directories(ColoredSeries PUBLIC "${PROJECT_SOURCE_DIR}/src")
 
+add_executable(RecordingPauseTest RecordingPauseTest.cpp)
+target_link_libraries(RecordingPauseTest PRIVATE Logger)
+target_include_directories(RecordingPauseTest PUBLIC "${PROJECT_SOURCE_DIR}/src")
+
