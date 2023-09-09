@@ -17,8 +17,8 @@ TEST(std_algorithm, transform_numeric) {
 
     try {
         RecordingSet<decltype(input)> set;
-        auto [f1, l1] = set.add("transform_reduce_input", input);
-        auto [f2, l2] = set.add("transform_reduce_output", output);
+        auto [f1, l1] = set.add("transform_reduce_input", "std::transform_reduce input", input);
+        auto [f2, l2] = set.add("transform_reduce_output", "std::transform_reduce output", output);
         set.runStopwatch();
         int result = std::transform_reduce(f1, l1, f2, init, bin_reduce, bin_transform);
         set.save();
