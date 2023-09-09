@@ -27,10 +27,8 @@ int main(int argc, char** argv) {
 
     try {
         App app(config);
-        for (;;) {
-            app.createPlayers(delayRatio, filenames);
-            app.run();
-        }
+        app.createPlayers(delayRatio, filenames);
+        app.run();
     }
     catch (const Exception& ex) {
         std::cerr << ex.what() << "\n";

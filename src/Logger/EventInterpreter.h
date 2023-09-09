@@ -1,9 +1,7 @@
 #ifndef EVENTINTERPRETER_H
 #define EVENTINTERPRETER_H
 
-#include <vector>
 #include <iostream>
-#include <chrono>
 #include <memory>
 #include <algorithm>
 #include <cstdint>
@@ -15,11 +13,9 @@
 #include "Logger/Event.h"
 
 // EventInterpreter gets from NotifyingIterator an events and interpreters those events as an access and a changes of data.
-template<typename Container>
+template <typename Container>
 class EventInterpreter: public IEventHandler {
 public:
-
-    using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
     // Class uses shared_ptr to stopwatch, because for one algorithm may be many EventInterpreter for each data
     // As example, the algorithm std::copy(f1, l1, f2) gets two diapasons: [f1, l1) and [f2, l2).
@@ -65,7 +61,6 @@ public:
     }
 
 private:
-    // TODO: save in class member
     using value_type = typename Container::value_type;
 
     void checkWriting() {
@@ -97,8 +92,6 @@ private:
     }
 
     Script script_;
-    const time_point startPoint_;
-
     Container copy_;
     std::shared_ptr<Container> original_;
     std::shared_ptr<Stopwatch> stopwatch_;
