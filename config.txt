@@ -9,3 +9,8 @@ BackgroundColor =  0x141e46ff
 ElementsColor =    0xfff5e0ff
 AccessColor =      0xff0000ff
 PlayerLabelColor = 0xfff5e0ff
+
+;BackgroundColor =  0xffffffff
+;ElementsColor =    0x141e46ff
+;AccessColor =      0xff0000ff
+;PlayerLabelColor = 0x141e46ff

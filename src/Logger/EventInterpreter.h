@@ -43,17 +43,16 @@ public:
             return;
         if (recordingIsPaused_ )
             return;
-
         // The time of interpretation of events must not interact to information about writing and access time.
         pause_guard pause(*stopwatch_);
-
         // Before check writing script is empty or last elements of it is Access.
         checkWriting();
+        addAccess(static_cast<Access&>(event));
+    }
 
-        Access& accEvent = static_cast<Access&>(event);
-        Action action{stopwatch_->elapsedNanoseconds(), Action::ACCESS, accEvent.getPos(), 0};
+    void addAccess(Access& access) {
+        Action action{stopwatch_->elapsedNanoseconds(), Action::ACCESS, access.getPos(), 0};
         script_.push_back(action);
-
     }
 
     const Script& getScript() {
