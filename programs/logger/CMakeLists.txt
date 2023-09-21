@@ -15,7 +15,9 @@ set (SRCS reduce_accumulate.cpp
           transform_numeric.cpp
           up_low_bound.cpp
           heap.cpp
-          remove_if.cpp
+          #remove_if.cpp
+          remove.cpp
+          rotate.cpp
 )
 add_executable(logger ${SRCS})
 #set_property (TARGET logger PROPERTY CXX_STANDARD 20) problem with shift

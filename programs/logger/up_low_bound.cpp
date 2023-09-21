@@ -28,7 +28,9 @@ TEST(std_algorithm, bound) {
         RecordingSet<decltype(data)> set;
         auto [f1, l1] = set.add("upper_bound", "std::upper_bound", data);
         set.runStopwatch();
-        std::upper_bound(f1, l1, 150);
+        auto it = std::upper_bound(f1, l1, 150);
+        // visualization must stop on returned position
+        *it;
         set.save();
     }
     catch (const Exception& ex) {

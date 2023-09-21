@@ -8,19 +8,15 @@
 #include "Logger/RecordingSet.h"
 #include "Common/Common.h"
 
-TEST(std_algorithm, next_permutation) {
-    int size = 4;
-    int times = 4*3*2;
-    std::vector<int> data(size);
+TEST(std_algorithm, rotate) {
+    std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 1);
 
     try {
         RecordingSet<decltype(data)> set;
-        auto [f1, l1] = set.add("next_permutation", "std::next_permutation", data);
+        auto [f1, l1] = set.add("rotate", "std::rotate", data);
         set.runStopwatch();
-        for (int i = 0; i < times - 1; ++i)
-            std::next_permutation(f1, l1);
-
+        std::rotate(f1, f1 + 100/3, l1);
         set.save();
     }
     catch (const Exception& ex) {
