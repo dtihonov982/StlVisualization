@@ -20,6 +20,21 @@ public:
         if (end < begin)
             throw Exception("Argument invalid.");
         Series::load(begin, end);
+        updateColors(begin, end);
+    }
+
+    template<typename It>
+    void load(It begin, It end, typename It::value_type maxValue) {
+        if (end < begin)
+            throw Exception("Argument invalid.");
+        Series::load(begin, end, maxValue);
+        updateColors(begin, end);
+    }
+
+    template<typename It>
+    void updateColors(It begin, It end) {
+        if (end < begin)
+            throw Exception("Argument invalid.");
         colors_.resize(end - begin);
         setColorsToDefault();
     }

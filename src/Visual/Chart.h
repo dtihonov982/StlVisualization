@@ -52,6 +52,11 @@ public:
         series_.load(begin, end);
     }
 
+    template <typename It>
+    void update(It begin, It end, typename It::value_type maxValue) {
+        series_.load(begin, end, maxValue);
+    }
+
     void setElementColor(size_t pos, const SDL_Color& color) {
         series_.setElementColor(pos, color);
     }

@@ -36,6 +36,14 @@ public:
         elements_ = emplace(geom_, begin, end, gapRate_, max);
     }
 
+    template<typename It>
+    void load(It begin, It end, typename It::value_type maxValue) {
+        elements_.clear();
+        if (end - begin <= 0)
+            return;
+        elements_ = emplace(geom_, begin, end, gapRate_, maxValue);
+    }
+
     size_t size() const { return elements_.size(); }
 
 
