@@ -8,6 +8,9 @@
 #include <cstdint>
 #include <filesystem>
 
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 struct Action {
     enum Type { ACCESS, WRITE };
 
@@ -17,6 +20,7 @@ struct Action {
     int value;
 
     std::string toString() const;
+    void toJSON(json& j) const;
     static Action loadFromString(std::string_view str);
 };
 

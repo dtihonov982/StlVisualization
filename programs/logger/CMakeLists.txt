@@ -9,6 +9,7 @@ set (SRCS reduce_accumulate.cpp
           reverse_copy.cpp
           next_permutation.cpp
           is_permutation.cpp
+          my_copy.cpp
           adjacent_difference.cpp
           partition.cpp
           merge.cpp

@@ -38,6 +38,17 @@ std::string Action::toString() const {
     return oss.str();
 }
 
+void Action::toJSON(json& j) const {
+    json tmp;
+    tmp["timePoint"] = timePoint;
+    tmp["pos"] = pos;
+    tmp["type"] = type == ACCESS ? "access" : "write";
+    if (type == WRITE) 
+        tmp["value"] = value;
+    j.push_back(tmp);
+
+}
+
 Action Action::loadFromString(std::string_view str) {
     if (str.empty())
         throw Exception("Can not load Action from empty string.");
@@ -116,11 +127,14 @@ void Record::save(const std::string& path) {
     std::ofstream file(path);
     if (!file)
         throw Exception("Can't open file ", path);
-    file << info << "\n";
-    file << data << "\n";
-    for (const auto& action: script) {
-        file << action.toString() << "\n";
-    }
+    json j;
+    j["info"] = info;
+    j["data"] = data;
+    json scriptArray = json::array();
+    for (const auto& action: script)
+        action.toJSON(scriptArray);
+    j["script"] = scriptArray;
+    file << j.dump(4);
 }
 
 Record Record::load(std::string_view filename) {
