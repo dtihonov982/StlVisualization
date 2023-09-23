@@ -34,6 +34,7 @@ struct Record {
 
     std::string info;
     std::vector<int> data;
+    std::vector<int> resultData;
     std::vector<Action> script;
 
     void save(const std::string& path);

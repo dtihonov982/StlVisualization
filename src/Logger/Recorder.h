@@ -62,6 +62,7 @@ public:
     void save() {
         auto path = getPathForSaving(name_);
         record_.script = interpreter_.getScript();
+        record_.resultData = *data_;
         record_.save(path);
     }
 

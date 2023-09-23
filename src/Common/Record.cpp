@@ -139,6 +139,7 @@ void Record::save(const std::string& path) {
     json j;
     j["info"] = info;
     j["data"] = data;
+    j["resultData"] = resultData;
     json scriptArray = json::array();
     for (const auto& action: script) {
         json tmp;
@@ -158,9 +159,8 @@ Record Record::load(std::string_view filename) {
 
     Record rec;
     rec.info = j["info"];
-    for (int i: j["data"]) {
-        rec.data.push_back(i);
-    }
+    rec.data = j["data"].template get<std::vector<int>>();
+    rec.resultData = j["resultData"].template get<std::vector<int>>();
     for (auto& e: j["script"]) {
         Action a = Action::fromJSON(e);
         rec.script.push_back(a);
