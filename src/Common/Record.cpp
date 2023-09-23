@@ -39,13 +39,11 @@ std::string Action::toString() const {
 }
 
 void Action::toJSON(json& j) const {
-    json tmp;
-    tmp["timePoint"] = timePoint;
-    tmp["pos"] = pos;
-    tmp["type"] = type == ACCESS ? "access" : "write";
+    j["timePoint"] = timePoint;
+    j["pos"] = pos;
+    j["type"] = type == ACCESS ? "access" : "write";
     if (type == WRITE) 
-        tmp["value"] = value;
-    j.push_back(tmp);
+        j["value"] = value;
 
 }
 
@@ -80,6 +78,17 @@ Action Action::loadFromString(std::string_view str) {
 
     return action;
 
+}
+
+Action Action::fromJSON(const json& j) {
+    Action a;
+    a.timePoint = j["timePoint"];
+    a.pos = j["pos"];
+    std::string typeName = j["type"];
+    a.type = typeName == "access" ? ACCESS : WRITE;
+    if (a.type == WRITE)
+        a.value = j["value"];
+    return a;
 }
 
 std::vector<std::string> split(std::string_view input, char delim) {
@@ -131,8 +140,11 @@ void Record::save(const std::string& path) {
     j["info"] = info;
     j["data"] = data;
     json scriptArray = json::array();
-    for (const auto& action: script)
-        action.toJSON(scriptArray);
+    for (const auto& action: script) {
+        json tmp;
+        action.toJSON(tmp);
+        scriptArray.push_back(tmp);
+    }
     j["script"] = scriptArray;
     file << j.dump(4);
 }
@@ -141,12 +153,19 @@ Record Record::load(std::string_view filename) {
     std::ifstream file{filename.data()};
     if (!file)
         throw Exception("Can't open file ", filename);
+    json j;
+    file >> j;
+
     Record rec;
-    std::getline(file, rec.info);
-    std::string dump;
-    std::getline(file, dump);
-    rec.data = loadDataFromDump(dump, ',');
-    rec.script = readScript(file, ',');
+    rec.info = j["info"];
+    for (int i: j["data"]) {
+        rec.data.push_back(i);
+    }
+    for (auto& e: j["script"]) {
+        Action a = Action::fromJSON(e);
+        rec.script.push_back(a);
+    } 
+
     return rec;
 }
         

@@ -73,7 +73,7 @@ public:
         fs::create_directory(logs);
         fs::path filename{algoName.data()};
         filename = logs / filename;
-        fs::path extension{".txt"};
+        fs::path extension{".json"};
         filename += extension;
         return filename;
     }

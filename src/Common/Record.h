@@ -22,6 +22,7 @@ struct Action {
     std::string toString() const;
     void toJSON(json& j) const;
     static Action loadFromString(std::string_view str);
+    static Action fromJSON(const json& j);
 };
 
 using Script = std::vector<Action>;
