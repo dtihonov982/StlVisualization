@@ -12,8 +12,10 @@ set (SRCS reduce_accumulate.cpp
           adjacent_difference.cpp
           partition.cpp
           merge.cpp
+          sort.cpp
           transform_numeric.cpp
           up_low_bound.cpp
+          numeric.cpp
           heap.cpp
           #remove_if.cpp
           remove.cpp

@@ -27,5 +27,19 @@ TEST(std_algorithm, merge) {
     catch (const Exception& ex) {
         FAIL() << ex.what();
     }
+
+    std::vector<int> ab(a);
+    ab.insert(ab.end(), b.begin(), b.end());
+    try {
+        RecordingSet<decltype(a)> set;
+        auto [f1, l1] = set.add("inplace_merge", "std::inplace_merge", ab);
+        set.runStopwatch();
+        std::inplace_merge(f1, f1 + ab.size() / 2, l1);
+        set.save();
+        EXPECT_TRUE(std::is_sorted(f1, l1));
+    }
+    catch (const Exception& ex) {
+        FAIL() << ex.what();
+    }
 }
 
